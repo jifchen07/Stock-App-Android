@@ -1,6 +1,7 @@
 package com.example.stockapp;
 
 //import android.support.v7.widget.Toolbar;
+import android.content.SharedPreferences;
 import android.os.Handler;
 import android.os.Message;
 import android.text.Editable;
@@ -17,9 +18,12 @@ import android.os.Bundle;
 import androidx.recyclerview.widget.RecyclerView;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 //import android.support.v7.app.AppCompatActivity;
@@ -44,7 +48,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        initData();
+        // initData();
+        loadData();
 
         mainRecyclerView = findViewById(R.id.mainRecyclerView);
         MainRecyclerAdapter mainRecyclerAdapter = new MainRecyclerAdapter(sectionList);
@@ -117,6 +122,35 @@ public class MainActivity extends AppCompatActivity {
         sectionList.add(new Section(sectionTwoName, sectionTwoItems));
 
         Log.d(TAG, "initData: " + sectionList);
+    }
+
+    private void loadData() {
+        SharedPreferences sharedPreferences = getSharedPreferences("shared preferences", MODE_PRIVATE);
+        Gson gson = new Gson();
+        String json = sharedPreferences.getString("section one", null);
+        Type type = new TypeToken<ArrayList<Stock>>(){}.getType();
+        List<Stock> sectionOneItems = gson.fromJson(json, type);
+
+        if (sectionOneItems == null) {
+            sectionOneItems = new ArrayList<>();
+            sectionOneItems.add(new Stock("AAPL", "name", 108.86, 5, true, -6.46));
+            sectionOneItems.add(new Stock("TSLA", "name", 388.04, 3, true, -22.79));
+        }
+
+        String json2 = sharedPreferences.getString("section two", null);
+        List<Stock> sectionTwoItems = gson.fromJson(json2, type);
+
+        if (sectionTwoItems == null) {
+            sectionTwoItems = new ArrayList<>();
+            sectionTwoItems.add(new Stock("NFLX", "name", 100.00, 0, true, -5.55));
+            sectionTwoItems.add(new Stock("AAPL", "name", 108.86, 5, true, -6.46));
+            sectionTwoItems.add(new Stock("TSLA", "name", 388.04, 3, true, -22.79));
+        }
+
+        String sectionOneName = "PORTFOLIO";
+        String sectionTwoName = "FAVORITES";
+        sectionList.add(new Section(sectionOneName, sectionOneItems));
+        sectionList.add(new Section(sectionTwoName, sectionTwoItems));
     }
 
     private void makeApiCall(String text) {
