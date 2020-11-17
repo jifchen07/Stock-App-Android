@@ -61,6 +61,9 @@ public class MainActivity extends AppCompatActivity implements ChildRecyclerAdap
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        Toolbar myToolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(myToolbar);
+
         // initData();
         loadData();
 
@@ -81,8 +84,6 @@ public class MainActivity extends AppCompatActivity implements ChildRecyclerAdap
                 findViewById(R.id.auto_complete_edit_text);
         final TextView selectedText = findViewById(R.id.selected_item);
 
-        Toolbar myToolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(myToolbar);
 
         //Setting up the adapter for AutoSuggest
         autoSuggestAdapter = new AutoSuggestAdapter(this,
