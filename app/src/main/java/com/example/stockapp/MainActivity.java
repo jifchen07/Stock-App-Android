@@ -1,6 +1,7 @@
 package com.example.stockapp;
 
 //import android.support.v7.widget.Toolbar;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Handler;
 import android.os.Message;
@@ -32,7 +33,7 @@ import java.lang.reflect.Type;
 import java.util.*;
 //import android.support.v7.app.AppCompatActivity;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements ChildRecyclerAdapter.OnArrowClick {
 
     private static final String TAG = "MainActivity";
 
@@ -64,7 +65,7 @@ public class MainActivity extends AppCompatActivity {
         loadData();
 
         mainRecyclerView = findViewById(R.id.mainRecyclerView);
-        mainRecyclerAdapter = new MainRecyclerAdapter(sectionList);
+        mainRecyclerAdapter = new MainRecyclerAdapter(sectionList, this);
         mainRecyclerView.setAdapter(mainRecyclerAdapter);
 
         // update the price data every 15 seconds
@@ -283,5 +284,12 @@ public class MainActivity extends AppCompatActivity {
             public void onErrorResponse(VolleyError error) {
             }
         });
+    }
+
+    @Override
+    public void onArrowClick(int position) {
+        Log.d(TAG, "onArrowClick: clicked");
+        Intent intent = new Intent(this, DetailActivity.class);
+        startActivity(intent);
     }
 }

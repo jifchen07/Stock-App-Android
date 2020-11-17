@@ -12,9 +12,11 @@ import java.util.List;
 public class MainRecyclerAdapter extends RecyclerView.Adapter<MainRecyclerAdapter.ViewHolder> {
 
     List<Section> sectionList;
+    ChildRecyclerAdapter.OnArrowClick onArrowClickListener;
 
-    public MainRecyclerAdapter(List<Section> sectionList) {
+    public MainRecyclerAdapter(List<Section> sectionList, ChildRecyclerAdapter.OnArrowClick onArrowClickListener) {
         this.sectionList = sectionList;
+        this.onArrowClickListener = onArrowClickListener;
     }
 
     @NonNull
@@ -34,7 +36,7 @@ public class MainRecyclerAdapter extends RecyclerView.Adapter<MainRecyclerAdapte
 
         holder.sectionNameTextView.setText(sectionName);
 
-        ChildRecyclerAdapter childRecyclerAdapter = new ChildRecyclerAdapter(items);
+        ChildRecyclerAdapter childRecyclerAdapter = new ChildRecyclerAdapter(items, onArrowClickListener);
         holder.childRecyclerView.setAdapter(childRecyclerAdapter);
 
     }
