@@ -41,4 +41,28 @@ public class Stock {
     public double getChange() {
         return change;
     }
+
+    public void setTicker(String ticker) {
+        this.ticker = ticker;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setLastPrice(double lastPrice) {
+        this.lastPrice = lastPrice;
+    }
+
+    public void setNumOfShares(int numOfShares) {
+        this.numOfShares = numOfShares;
+    }
+
+    public void setFavorite(boolean favorite) {
+        isFavorite = favorite;
+    }
+
+    public void setChange(double change) {
+        this.change = change;
+    }
 }

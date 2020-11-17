@@ -16,16 +16,20 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import androidx.recyclerview.widget.RecyclerView;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonArrayRequest;
+import com.android.volley.toolbox.Volley;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 //import android.support.v7.app.AppCompatActivity;
 
 public class MainActivity extends AppCompatActivity {
@@ -42,6 +46,14 @@ public class MainActivity extends AppCompatActivity {
     List<Section> sectionList = new ArrayList<>();
     RecyclerView mainRecyclerView;
 
+    Map<String, Stock> stockSet;
+    ArrayList<String> portfolioList;
+    ArrayList<String> watchList;
+
+    MainRecyclerAdapter mainRecyclerAdapter;
+
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,9 +64,16 @@ public class MainActivity extends AppCompatActivity {
         loadData();
 
         mainRecyclerView = findViewById(R.id.mainRecyclerView);
-        MainRecyclerAdapter mainRecyclerAdapter = new MainRecyclerAdapter(sectionList);
+        mainRecyclerAdapter = new MainRecyclerAdapter(sectionList);
         mainRecyclerView.setAdapter(mainRecyclerAdapter);
 
+        // update the price data every 15 seconds
+//        new Timer().scheduleAtFixedRate(new TimerTask() {
+//            @Override
+//            public void run() {
+//                updatePrice();
+//            }
+//        }, 15000, 15000);
 
         // for auto complete
         final AppCompatAutoCompleteTextView autoCompleteTextView =
@@ -124,7 +143,7 @@ public class MainActivity extends AppCompatActivity {
         Log.d(TAG, "initData: " + sectionList);
     }
 
-    private void loadData() {
+    private void loadData2() {
         SharedPreferences sharedPreferences = getSharedPreferences("shared preferences", MODE_PRIVATE);
         Gson gson = new Gson();
         String json = sharedPreferences.getString("section one", null);
@@ -133,8 +152,8 @@ public class MainActivity extends AppCompatActivity {
 
         if (sectionOneItems == null) {
             sectionOneItems = new ArrayList<>();
-            sectionOneItems.add(new Stock("AAPL", "name", 108.86, 5, true, -6.46));
-            sectionOneItems.add(new Stock("TSLA", "name", 388.04, 3, true, -22.79));
+            sectionOneItems.add(new Stock("AAPL", "Apple Inc", 108.86, 5, true, -6.46));
+            sectionOneItems.add(new Stock("TSLA", "Tesla Inc", 388.04, 3, true, -22.79));
         }
 
         String json2 = sharedPreferences.getString("section two", null);
@@ -142,15 +161,101 @@ public class MainActivity extends AppCompatActivity {
 
         if (sectionTwoItems == null) {
             sectionTwoItems = new ArrayList<>();
-            sectionTwoItems.add(new Stock("NFLX", "name", 100.00, 0, true, -5.55));
-            sectionTwoItems.add(new Stock("AAPL", "name", 108.86, 5, true, -6.46));
-            sectionTwoItems.add(new Stock("TSLA", "name", 388.04, 3, true, -22.79));
+            sectionTwoItems.add(new Stock("NFLX", "NetFlix Inc", 100.00, 0, true, -5.55));
+            sectionTwoItems.add(new Stock("AAPL", "Apple Inc", 108.86, 5, true, -6.46));
+            sectionTwoItems.add(new Stock("TSLA", "Tesla Inc", 388.04, 3, true, -22.79));
         }
 
         String sectionOneName = "PORTFOLIO";
         String sectionTwoName = "FAVORITES";
         sectionList.add(new Section(sectionOneName, sectionOneItems));
         sectionList.add(new Section(sectionTwoName, sectionTwoItems));
+    }
+
+    private void loadData() {
+        SharedPreferences sharedPreferences = getSharedPreferences("shared preferences", MODE_PRIVATE);
+        Gson gson = new Gson();
+        String json_map = sharedPreferences.getString("stock map", null);
+        Type type = new TypeToken<HashMap<String, Stock>>(){}.getType();
+        stockSet = gson.fromJson(json_map, type);
+        if (stockSet == null) {
+            stockSet = new HashMap<>();
+            stockSet.put("AAPL", new Stock("AAPL", "Apple Inc", 108.86, 5, true, -6.46));
+            stockSet.put("TSLA", new Stock("TSLA", "Tesla Inc", 388.04, 3, true, -22.79));
+            stockSet.put("NFLX", new Stock("NFLX", "NetFlix Inc", 100.00, 0, true, -5.55));
+        }
+        if (stockSet.size() > 0) {
+            updatePrice();
+        }
+
+        String json_portfolio = sharedPreferences.getString("portfolio", null);
+        Type type2 = new TypeToken<ArrayList<String>>(){}.getType();
+        portfolioList = gson.fromJson(json_portfolio, type2);
+        if (portfolioList == null) {
+            portfolioList = new ArrayList<>(Arrays.asList("AAPL", "TSLA"));
+        }
+
+        String json_watchList = sharedPreferences.getString("watchlist", null);
+        watchList = gson.fromJson(json_watchList, type2);
+        if (watchList == null) {
+            watchList= new ArrayList<>(Arrays.asList("NFLX", "AAPL", "TSLA"));
+        }
+
+        String sectionOneName = "PORTFOLIO";
+        String sectionTwoName = "FAVORITES";
+        List<Stock> sectionOneItems = new ArrayList<>();
+        List<Stock> sectionTwoItems = new ArrayList<>();
+        for (int i = 0; i < portfolioList.size(); i++) {
+            sectionOneItems.add(stockSet.get(portfolioList.get(i)));
+        }
+        for (int i = 0; i < watchList.size(); i++) {
+            sectionTwoItems.add(stockSet.get(watchList.get(i)));
+        }
+
+        sectionList = new ArrayList<Section>();
+        sectionList.add(new Section(sectionOneName, sectionOneItems));
+        sectionList.add(new Section(sectionTwoName, sectionTwoItems));
+    }
+
+    private void updatePrice() {
+        List<String> tickers = new ArrayList<>(stockSet.keySet());
+        String tickersString  = "";
+        for (int i = 0; i < tickers.size(); i++) {
+            tickersString = tickersString + tickers.get(i) + ",";
+        }
+        tickersString = tickersString.substring(0, tickersString.length() - 1);
+        String url = "https://stock-search-backend-110320.wl.r.appspot.com/search/latestprice/" + tickersString;
+
+        RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
+        JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(Request.Method.GET,
+                url,
+                null,
+                new Response.Listener<JSONArray>() {
+                    @Override
+                    public void onResponse(JSONArray response) {
+                        try {
+                            for (int i = 0; i < response.length(); i++) {
+                                JSONObject data = response.getJSONObject(i);
+                                String ticker = data.getString("ticker");
+                                Double lastPrice = data.getDouble("last");
+                                Double prevClose = data.getDouble("prevClose");
+                                Double change = (lastPrice - prevClose) / prevClose * 100;
+                                stockSet.get(ticker).setLastPrice(lastPrice);
+                                stockSet.get(ticker).setChange(change);
+                            }
+                            Log.d(TAG, "onResponse: " + stockSet.get("AAPL").getLastPrice());
+                            mainRecyclerAdapter.notifyDataSetChanged();
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                error.printStackTrace();
+            }
+        });
+        queue.add(jsonArrayRequest);
     }
 
     private void makeApiCall(String text) {
