@@ -1,11 +1,15 @@
 package com.example.stockapp;
 
+import android.content.Intent;
+import android.util.Log;
 import android.view.View;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import androidx.appcompat.widget.Toolbar;
 
 public class DetailActivity extends AppCompatActivity {
+    private static final String TAG = "DetailActivity";
+    private Stock stock;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -15,7 +19,7 @@ public class DetailActivity extends AppCompatActivity {
         Toolbar myToolbar = findViewById(R.id.toolbar);
         setSupportActionBar(myToolbar);
 
-        getSupportActionBar().setDisplayShowTitleEnabled(false);
+        // getSupportActionBar().setDisplayShowTitleEnabled(false);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
@@ -26,5 +30,16 @@ public class DetailActivity extends AppCompatActivity {
                 finish();
             }
         });
+
+        Intent intent = getIntent();
+
+        stock = (Stock) intent.getSerializableExtra(MainActivity.EXTRA_TICKER);
+
+        Log.d(TAG, "onCreate: " + stock.getTicker());
+
+    }
+
+    private void fetchData() {
+
     }
 }

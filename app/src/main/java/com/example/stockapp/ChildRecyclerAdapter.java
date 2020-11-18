@@ -71,11 +71,13 @@ public class ChildRecyclerAdapter extends RecyclerView.Adapter<ChildRecyclerAdap
 
         @Override
         public void onClick(View v) {
-            onArrowClickListener.onArrowClick(getAdapterPosition());
+            int position = getAdapterPosition();
+            Stock stock = items.get(position);
+            onArrowClickListener.onArrowClick(stock);
         }
     }
 
     public interface OnArrowClick {
-        void onArrowClick(int position);
+        void onArrowClick(Stock stock);
     }
 }

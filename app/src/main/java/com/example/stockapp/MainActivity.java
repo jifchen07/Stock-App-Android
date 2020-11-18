@@ -35,6 +35,8 @@ import java.util.*;
 
 public class MainActivity extends AppCompatActivity implements ChildRecyclerAdapter.OnArrowClick {
 
+    public static final String EXTRA_TICKER = "com.example.stockapp.EXTRA_TICKER";
+
     private static final String TAG = "MainActivity";
 
     // for autocomplete
@@ -80,6 +82,11 @@ public class MainActivity extends AppCompatActivity implements ChildRecyclerAdap
 //        }, 15000, 15000);
 
         // for auto complete
+        autoComplete();
+
+    }
+
+    private void autoComplete() {
         final AppCompatAutoCompleteTextView autoCompleteTextView =
                 findViewById(R.id.auto_complete_edit_text);
         final TextView selectedText = findViewById(R.id.selected_item);
@@ -127,24 +134,6 @@ public class MainActivity extends AppCompatActivity implements ChildRecyclerAdap
         });
     }
 
-    private void initData() {
-        String sectionOneName = "PORTFOLIO";
-        List<Stock> sectionOneItems = new ArrayList<>();
-        sectionOneItems.add(new Stock("AAPL", "name", 108.86, 5, true, -6.46));
-        sectionOneItems.add(new Stock("TSLA", "name", 388.04, 3, true, -22.79));
-
-        String sectionTwoName = "FAVORITES";
-        List<Stock> sectionTwoItems = new ArrayList<>();
-        sectionTwoItems.add(new Stock("NFLX", "name", 100.00, 0, true, -5.55));
-        sectionTwoItems.add(new Stock("AAPL", "name", 108.86, 5, true, -6.46));
-        sectionTwoItems.add(new Stock("TSLA", "name", 388.04, 3, true, -22.79));
-        
-        sectionList.add(new Section(sectionOneName, sectionOneItems));
-        sectionList.add(new Section(sectionTwoName, sectionTwoItems));
-
-        Log.d(TAG, "initData: " + sectionList);
-    }
-
     private void loadData2() {
         SharedPreferences sharedPreferences = getSharedPreferences("shared preferences", MODE_PRIVATE);
         Gson gson = new Gson();
@@ -154,8 +143,8 @@ public class MainActivity extends AppCompatActivity implements ChildRecyclerAdap
 
         if (sectionOneItems == null) {
             sectionOneItems = new ArrayList<>();
-            sectionOneItems.add(new Stock("AAPL", "Apple Inc", 108.86, 5, true, -6.46));
-            sectionOneItems.add(new Stock("TSLA", "Tesla Inc", 388.04, 3, true, -22.79));
+            sectionOneItems.add(new Stock("AAPL", "Apple Inc", 108.86, 5, true, -6.46, 500));
+            sectionOneItems.add(new Stock("TSLA", "Tesla Inc", 388.04, 3, true, -22.79, 1000));
         }
 
         String json2 = sharedPreferences.getString("section two", null);
@@ -163,9 +152,9 @@ public class MainActivity extends AppCompatActivity implements ChildRecyclerAdap
 
         if (sectionTwoItems == null) {
             sectionTwoItems = new ArrayList<>();
-            sectionTwoItems.add(new Stock("NFLX", "NetFlix Inc", 100.00, 0, true, -5.55));
-            sectionTwoItems.add(new Stock("AAPL", "Apple Inc", 108.86, 5, true, -6.46));
-            sectionTwoItems.add(new Stock("TSLA", "Tesla Inc", 388.04, 3, true, -22.79));
+            sectionTwoItems.add(new Stock("NFLX", "NetFlix Inc", 100.00, 0, true, -5.55, 0));
+            sectionTwoItems.add(new Stock("AAPL", "Apple Inc", 108.86, 5, true, -6.46, 500));
+            sectionTwoItems.add(new Stock("TSLA", "Tesla Inc", 388.04, 3, true, -22.79, 1000));
         }
 
         String sectionOneName = "PORTFOLIO";
@@ -181,10 +170,11 @@ public class MainActivity extends AppCompatActivity implements ChildRecyclerAdap
         Type type = new TypeToken<HashMap<String, Stock>>(){}.getType();
         stockSet = gson.fromJson(json_map, type);
         if (stockSet == null) {
+            Log.d(TAG, "loadData: stockSet is null");
             stockSet = new HashMap<>();
-            stockSet.put("AAPL", new Stock("AAPL", "Apple Inc", 108.86, 5, true, -6.46));
-            stockSet.put("TSLA", new Stock("TSLA", "Tesla Inc", 388.04, 3, true, -22.79));
-            stockSet.put("NFLX", new Stock("NFLX", "NetFlix Inc", 100.00, 0, true, -5.55));
+            stockSet.put("AAPL", new Stock("AAPL", "Apple Inc", 108.86, 5, true, -6.46, 500));
+            stockSet.put("TSLA", new Stock("TSLA", "Tesla Inc", 388.04, 3, true, -22.79, 1000));
+            stockSet.put("NFLX", new Stock("NFLX", "NetFlix Inc", 100.00, 0, true, -5.55, 0));
         }
         if (stockSet.size() > 0) {
             updatePrice();
@@ -194,15 +184,24 @@ public class MainActivity extends AppCompatActivity implements ChildRecyclerAdap
         Type type2 = new TypeToken<ArrayList<String>>(){}.getType();
         portfolioList = gson.fromJson(json_portfolio, type2);
         if (portfolioList == null) {
+            Log.d(TAG, "loadData: portfolio is null");
             portfolioList = new ArrayList<>(Arrays.asList("AAPL", "TSLA"));
         }
 
         String json_watchList = sharedPreferences.getString("watchlist", null);
         watchList = gson.fromJson(json_watchList, type2);
         if (watchList == null) {
+            Log.d(TAG, "loadData: watchlist is null");
             watchList= new ArrayList<>(Arrays.asList("NFLX", "AAPL", "TSLA"));
         }
 
+        saveData();
+
+        updateSectionList();
+
+    }
+
+    private void updateSectionList() {
         String sectionOneName = "PORTFOLIO";
         String sectionTwoName = "FAVORITES";
         List<Stock> sectionOneItems = new ArrayList<>();
@@ -217,6 +216,19 @@ public class MainActivity extends AppCompatActivity implements ChildRecyclerAdap
         sectionList = new ArrayList<Section>();
         sectionList.add(new Section(sectionOneName, sectionOneItems));
         sectionList.add(new Section(sectionTwoName, sectionTwoItems));
+    }
+
+    private void saveData() {
+        SharedPreferences sharedPreferences = getSharedPreferences("shared preferences", MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        Gson gson = new Gson();
+        String json_map = gson.toJson(stockSet);
+        String json_portfolio = gson.toJson(portfolioList);
+        String json_watchlist = gson.toJson(watchList);
+        editor.putString("stock map", json_map);
+        editor.putString("portfolio", json_portfolio);
+        editor.putString("watchlist", json_watchlist);
+        editor.apply();
     }
 
     private void updatePrice() {
@@ -288,9 +300,10 @@ public class MainActivity extends AppCompatActivity implements ChildRecyclerAdap
     }
 
     @Override
-    public void onArrowClick(int position) {
-        Log.d(TAG, "onArrowClick: clicked");
+    public void onArrowClick(Stock stock) {
+        Log.d(TAG, "onArrowClick: " + stock.getTicker());
         Intent intent = new Intent(this, DetailActivity.class);
+        intent.putExtra(EXTRA_TICKER, stock);
         startActivity(intent);
     }
 }
