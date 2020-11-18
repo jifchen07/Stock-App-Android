@@ -10,6 +10,7 @@ import androidx.appcompat.widget.Toolbar;
 public class DetailActivity extends AppCompatActivity {
     private static final String TAG = "DetailActivity";
     private Stock stock;
+    private MyApplication appData;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,8 +36,11 @@ public class DetailActivity extends AppCompatActivity {
 
         stock = (Stock) intent.getSerializableExtra(MainActivity.EXTRA_TICKER);
 
-        Log.d(TAG, "onCreate: " + stock.getTicker());
+        appData = (MyApplication) getApplicationContext();
 
+        Log.d(TAG, "onCreate: " + stock.getTicker());
+        Log.d(TAG, "onCreate: " + appData.getPortfolioList());
+        Log.d(TAG, "onCreate: " + appData.getWatchList());
     }
 
     private void fetchData() {

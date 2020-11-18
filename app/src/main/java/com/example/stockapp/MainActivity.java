@@ -55,6 +55,8 @@ public class MainActivity extends AppCompatActivity implements ChildRecyclerAdap
 
     MainRecyclerAdapter mainRecyclerAdapter;
 
+    // for application data
+    MyApplication appData;
 
 
 
@@ -163,6 +165,7 @@ public class MainActivity extends AppCompatActivity implements ChildRecyclerAdap
         sectionList.add(new Section(sectionTwoName, sectionTwoItems));
     }
 
+    // load data from shared preference
     private void loadData() {
         SharedPreferences sharedPreferences = getSharedPreferences("shared preferences", MODE_PRIVATE);
         Gson gson = new Gson();
@@ -199,6 +202,14 @@ public class MainActivity extends AppCompatActivity implements ChildRecyclerAdap
 
         updateSectionList();
 
+        passDataToApplication();
+    }
+
+    private void passDataToApplication() {
+        appData = (MyApplication) getApplicationContext();
+        appData.setStockSet(stockSet);
+        appData.setPortfolioList(portfolioList);
+        appData.setWatchList(watchList);
     }
 
     private void updateSectionList() {
