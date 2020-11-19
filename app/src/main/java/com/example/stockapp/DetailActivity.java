@@ -5,6 +5,8 @@ import android.util.Log;
 import android.view.View;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.GridView;
+import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import androidx.appcompat.widget.Toolbar;
@@ -38,6 +40,7 @@ public class DetailActivity extends AppCompatActivity {
     private Double highPrice;
     private Double bidPrice;
     private Double openPrice;
+    private Double marketValue;
 
     private int volume;
 
@@ -45,6 +48,18 @@ public class DetailActivity extends AppCompatActivity {
 
 
     private RequestQueue queue;
+
+    TextView tickerTextView;
+    TextView nameTextView;
+    TextView lastPriceTextView;
+    TextView changeTextView;
+    TextView sharesOwnedTextView;
+    TextView marketValueTextView;
+
+    GridView gridViewStats;
+    GridViewAdapter gridViewAdapter;
+    String[] gridData = {"Current Price: ", "Low: ", "Bid Price: ", "Open Price: ", "Mid: ", "High: ", "Volume: "};
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,10 +94,36 @@ public class DetailActivity extends AppCompatActivity {
 
         queue = Volley.newRequestQueue(getApplicationContext());
 
+        findViews();
+        fetchDescription();
+        fetchLatestPrice();
+        // renderViews();
+
         webView = (WebView) findViewById(R.id.webView);
         webView.setWebViewClient(new WebViewClient());
         webView.getSettings().setJavaScriptEnabled (true);
         webView.loadUrl("file:///android_asset/highchart.html?ticker=" + ticker);
+
+        gridViewAdapter = new GridViewAdapter(getApplicationContext(), gridData);
+        gridViewStats.setAdapter(gridViewAdapter);
+    }
+
+    private void findViews() {
+        tickerTextView = (TextView) findViewById(R.id.textViewTicker);
+        nameTextView = (TextView) findViewById(R.id.textViewName);
+        lastPriceTextView = (TextView) findViewById(R.id.textViewLastPrice);
+        changeTextView = (TextView) findViewById(R.id.textViewChange);
+
+        sharesOwnedTextView = (TextView) findViewById(R.id.textViewSharesOwned);
+        marketValueTextView = (TextView) findViewById(R.id.textViewMarketValue);
+        gridViewStats = (GridView) findViewById(R.id.gridViewStats);
+    }
+
+    private void renderViews() {
+        tickerTextView.setText(ticker);
+        nameTextView.setText(name);
+        lastPriceTextView.setText(Double.toString(lastPrice));
+        changeTextView.setText(Double.toString(changePrice));
     }
 
     private void fetchDescription() {
@@ -97,6 +138,9 @@ public class DetailActivity extends AppCompatActivity {
                         try {
                             name = response.getString("name");
                             description = response.getString("description");
+
+                            nameTextView.setText(name);
+                            tickerTextView.setText(ticker);
 
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -125,12 +169,30 @@ public class DetailActivity extends AppCompatActivity {
                             JSONObject data = response.getJSONObject(0);
                             lastPrice = data.getDouble("last");
                             changePrice = lastPrice - data.getDouble("prevClose");
-                            lowPrice = data.getDouble("low");
-                            midPrice = data.getDouble("mid");
-                            highPrice = data.getDouble("high");
-                            bidPrice = data.getDouble("bid");
-                            openPrice = data.getDouble("open");
-                            volume = data.getInt("volume");
+                            lowPrice = data.isNull("low") ? null : data.getDouble("low");
+                            midPrice = data.isNull("mid") ? null : data.getDouble("mid");
+                            highPrice = data.isNull("high") ? null : data.getDouble("high");
+                            bidPrice = data.isNull("bidPrice") ? null : data.getDouble("bidPrice");
+                            openPrice = data.isNull("open") ? null : data.getDouble("open");
+                            volume = data.isNull("volume") ? null : data.getInt("volume");
+
+                            marketValue = stock.getNumOfShares() * lastPrice;
+
+                            Log.d(TAG, "onResponse: " + String.format("%.2f", lastPrice));
+                            lastPriceTextView.setText(String.format("%.2f", lastPrice));
+                            changeTextView.setText(String.format("%.2f", changePrice));
+                            sharesOwnedTextView.setText("Shares owned: " + stock.getNumOfShares());
+                            marketValueTextView.setText("Market Value: $" + String.format("%.2f", marketValue));
+
+                            gridData[0] = "Current Price: " + String.format("%.2f", lastPrice);
+                            gridData[1] = "Low: " + ((lowPrice == null) ? "-" : String.format("%.2f", lowPrice));
+                            gridData[2] = "Bid Price: " + ((bidPrice == null) ? "-" : String.format("%.2f", bidPrice));
+                            gridData[3] = "Open Price: " + ((openPrice == null) ? "-" : String.format("%.2f", openPrice));
+                            gridData[4] = "Mid: " + ((midPrice == null) ? "-" : String.format("%.2f", midPrice));
+                            gridData[5] = "High: " + ((highPrice == null) ? "-" : String.format("%.2f", highPrice));
+                            gridData[6] = "Volume: " + volume;
+
+                            gridViewAdapter.notifyDataSetChanged();
 
                         } catch (JSONException e) {
                             e.printStackTrace();
