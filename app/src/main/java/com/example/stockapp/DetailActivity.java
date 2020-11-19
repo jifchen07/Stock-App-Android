@@ -6,6 +6,7 @@ import android.view.View;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.GridView;
+import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
@@ -17,13 +18,19 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+import com.bumptech.glide.Glide;
+import com.google.gson.JsonObject;
 import com.ms.square.android.expandabletextview.ExpandableTextView;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.lang.reflect.Array;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 public class DetailActivity extends AppCompatActivity {
     private static final String TAG = "DetailActivity";
@@ -63,6 +70,12 @@ public class DetailActivity extends AppCompatActivity {
 
     ExpandableTextView expTv1;
 
+    List<JSONObject> newsItems;
+    ImageView firstNewsImageView;
+    TextView firstNewsSourceTextView;
+    TextView firstNewsDateTextView;
+    TextView firstNewsTitleTextView;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -99,6 +112,7 @@ public class DetailActivity extends AppCompatActivity {
         findViews();
         fetchDescription();
         fetchLatestPrice();
+        fetchNews();
         // renderViews();
 
         webView = (WebView) findViewById(R.id.webView);
@@ -108,6 +122,8 @@ public class DetailActivity extends AppCompatActivity {
 
         gridViewAdapter = new GridViewAdapter(getApplicationContext(), gridData);
         gridViewStats.setAdapter(gridViewAdapter);
+
+
     }
 
     private void findViews() {
@@ -121,6 +137,11 @@ public class DetailActivity extends AppCompatActivity {
         gridViewStats = (GridView) findViewById(R.id.gridViewStats);
 
         expTv1 = (ExpandableTextView) findViewById(R.id.expand_text_view);
+
+        firstNewsImageView = (ImageView) findViewById(R.id.imageViewFirstNews);
+        firstNewsSourceTextView = (TextView) findViewById(R.id.textViewFirstNewsSource);
+        firstNewsDateTextView = (TextView) findViewById(R.id.textViewFirstNewsDate);
+        firstNewsTitleTextView = (TextView) findViewById(R.id.textViewFirstNewsTitle);
     }
 
     private void renderViews() {
@@ -213,4 +234,65 @@ public class DetailActivity extends AppCompatActivity {
         queue.add(jsonArrayRequest);
     }
 
+    private void fetchNews() {
+        String url = "https://stock-search-backend-110320.wl.r.appspot.com/search/news/" + ticker;
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET,
+                url,
+                null,
+                new Response.Listener<JSONObject>() {
+
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        try {
+                            newsItems = new ArrayList<>();
+                            JSONArray articles = response.getJSONArray("articles");
+                            JSONObject object;
+                            for (int i = 0; i < articles.length(); i++) {
+                                object = articles.getJSONObject(i);
+                                newsItems.add(object);
+                            }
+
+                            JSONObject firstNews = newsItems.get(0);
+                            Glide.with(getApplicationContext())
+                                    .load(firstNews.getString("urlToImage"))
+                                    .centerCrop()
+                                    .into(firstNewsImageView);
+                            firstNewsSourceTextView
+                                    .setText(firstNews.getJSONObject("source").getString("name"));
+                            firstNewsTitleTextView
+                                    .setText(firstNews.getString("title"));
+                            firstNewsDateTextView
+                                    .setText(calTimeDiff(firstNews.getString("publishedAt")));
+
+
+
+                        } catch (JSONException | ParseException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        error.printStackTrace();
+                    }
+                });
+        queue.add(jsonObjectRequest);
+    }
+
+    public static String calTimeDiff(String publishedAt) throws ParseException {
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+        Date date1 = format.parse(publishedAt);
+        Date date2 = new Date();
+        long difference = date2.getTime() - date1.getTime();
+        long seconds = difference / 1000;
+        long minutes = seconds / 60;
+        long hours = minutes / 60;
+        long days = hours / 24;
+        if (days > 0) {
+            return String.format("%d days ago", days);
+        } else {
+            return String.format("%d minutes ago", minutes);
+        }
+    }
 }
