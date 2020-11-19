@@ -17,6 +17,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+import com.ms.square.android.expandabletextview.ExpandableTextView;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -60,6 +61,7 @@ public class DetailActivity extends AppCompatActivity {
     GridViewAdapter gridViewAdapter;
     String[] gridData = {"Current Price: ", "Low: ", "Bid Price: ", "Open Price: ", "Mid: ", "High: ", "Volume: "};
 
+    ExpandableTextView expTv1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -117,6 +119,8 @@ public class DetailActivity extends AppCompatActivity {
         sharesOwnedTextView = (TextView) findViewById(R.id.textViewSharesOwned);
         marketValueTextView = (TextView) findViewById(R.id.textViewMarketValue);
         gridViewStats = (GridView) findViewById(R.id.gridViewStats);
+
+        expTv1 = (ExpandableTextView) findViewById(R.id.expand_text_view);
     }
 
     private void renderViews() {
@@ -141,6 +145,7 @@ public class DetailActivity extends AppCompatActivity {
 
                             nameTextView.setText(name);
                             tickerTextView.setText(ticker);
+                            expTv1.setText(description);
 
                         } catch (JSONException e) {
                             e.printStackTrace();

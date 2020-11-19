@@ -96,10 +96,51 @@
                         app:layout_constraintTop_toTopOf="parent" app:layout_constraintStart_toStartOf="parent"/>
                 <GridView
                         android:layout_width="0dp"
-                        android:layout_height="200dp" app:layout_constraintTop_toBottomOf="@+id/textView13"
+                        android:layout_height="100dp" app:layout_constraintTop_toBottomOf="@+id/textView13"
                         app:layout_constraintStart_toStartOf="parent" app:layout_constraintEnd_toEndOf="parent"
                         android:numColumns="3" android:id="@+id/gridViewStats" android:verticalSpacing="10dp"
                         android:layout_marginTop="8dp"/>
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                <TextView
+                        android:text="About"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" android:id="@+id/textView14"
+                        app:layout_constraintTop_toTopOf="parent" app:layout_constraintStart_toStartOf="parent"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                />
+                <com.ms.square.android.expandabletextview.ExpandableTextView
+                        app:layout_constraintTop_toBottomOf="@+id/textView14"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        android:verticalSpacing="10dp"
+                        android:id="@+id/expand_text_view"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:maxCollapsedLines="2"
+                        app:animDuration="200"
+                        app:collapseDrawable="@drawable/show_less"
+                        app:expandDrawable="@drawable/show_more">
+                    <TextView
+                            android:id="@id/expandable_text"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="10dp"
+                            android:layout_marginRight="10dp"
+                            android:textSize="16sp"
+                            android:textColor="#666666"/>
+                    <ImageButton
+                            android:id="@id/expand_collapse"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:padding="2dp"
+                            android:layout_gravity="right|bottom"
+                            android:background="@android:color/transparent" android:layout_marginRight="10dp"/>
+                </com.ms.square.android.expandabletextview.ExpandableTextView>
             </androidx.constraintlayout.widget.ConstraintLayout>
         </LinearLayout>
     </ScrollView>
