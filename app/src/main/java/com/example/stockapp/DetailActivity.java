@@ -12,6 +12,7 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import androidx.appcompat.widget.Toolbar;
+import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.android.volley.Request;
@@ -267,7 +268,7 @@ public class DetailActivity extends AppCompatActivity implements NewsCardAdapter
                                 newsItems.add(object);
                             }
 
-                            JSONObject firstNews = articles.getJSONObject(0);
+                            final JSONObject firstNews = articles.getJSONObject(0);
                             Glide.with(getApplicationContext())
                                     .load(firstNews.getString("urlToImage"))
                                     .centerCrop()
@@ -278,6 +279,20 @@ public class DetailActivity extends AppCompatActivity implements NewsCardAdapter
                                     .setText(firstNews.getString("title"));
                             firstNewsDateTextView
                                     .setText(calTimeDiff(firstNews.getString("publishedAt")));
+                            CardView firstNewsCardView = (CardView) findViewById(R.id.cardViewFirstNews);
+                            firstNewsCardView.setOnClickListener(new View.OnClickListener() {
+
+                                @Override
+                                public void onClick(View v) {
+                                    Intent browserIntent = null;
+                                    try {
+                                        browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(firstNews.getString("url")));
+                                    } catch (JSONException e) {
+                                        e.printStackTrace();
+                                    }
+                                    startActivity(browserIntent);
+                                }
+                            });
 
                             newsAdapter.notifyDataSetChanged();
 //                            layoutManager = new LinearLayoutManager(getApplicationContext());
