@@ -32,8 +32,9 @@ public class ApiCall {
     }
     public static void make(Context ctx, String query, Response.Listener<String>
             listener, Response.ErrorListener errorListener) {
-        String url = "https://itunes.apple.com/search?term=" + query
-                + "&country=US";
+        String url = "https://stock-search-backend-110320.wl.r.appspot.com/search/autocomplete/"
+                + query;
+
         StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
                 listener, errorListener);
         ApiCall.getInstance(ctx).addToRequestQueue(stringRequest);

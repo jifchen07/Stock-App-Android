@@ -36,11 +36,13 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 public class DetailActivity extends AppCompatActivity implements NewsCardAdapter.OnNewsListener {
     private static final String TAG = "DetailActivity";
     private Stock stock;
     private MyApplication appData;
+    private Map<String, Stock> stockSet;
 
     private String ticker;
     private String name;
@@ -107,10 +109,16 @@ public class DetailActivity extends AppCompatActivity implements NewsCardAdapter
 
         Intent intent = getIntent();
 
-        stock = (Stock) intent.getSerializableExtra(MainActivity.EXTRA_TICKER);
-        ticker = stock.getTicker();
+        ticker = intent.getStringExtra(MainActivity.EXTRA_TICKER);
 
         appData = (MyApplication) getApplicationContext();
+        stockSet = appData.getStockSet();
+        if (stockSet.containsKey(ticker)) {
+            stock = stockSet.get(ticker);
+        } else {
+            stock = new Stock(ticker, "", 0.0, 0, false, 0.0,0.0);
+        }
+
 
         Log.d(TAG, "onCreate: " + stock.getTicker());
         Log.d(TAG, "onCreate: " + appData.getPortfolioList());
