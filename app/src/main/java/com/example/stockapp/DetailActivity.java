@@ -1,5 +1,6 @@
 package com.example.stockapp;
 
+import android.app.Dialog;
 import android.content.Intent;
 import android.net.Uri;
 import android.util.Log;
@@ -287,10 +288,22 @@ public class DetailActivity extends AppCompatActivity implements NewsCardAdapter
                                     Intent browserIntent = null;
                                     try {
                                         browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(firstNews.getString("url")));
+                                        startActivity(browserIntent);
                                     } catch (JSONException e) {
                                         e.printStackTrace();
                                     }
-                                    startActivity(browserIntent);
+                                }
+                            });
+                            firstNewsCardView.setOnLongClickListener(new View.OnLongClickListener() {
+
+                                @Override
+                                public boolean onLongClick(View v) {
+                                    try {
+                                        openNewsDialog(firstNews);
+                                    } catch (JSONException e) {
+                                        e.printStackTrace();
+                                    }
+                                    return true;
                                 }
                             });
 
@@ -312,6 +325,48 @@ public class DetailActivity extends AppCompatActivity implements NewsCardAdapter
                     }
                 });
         queue.add(jsonObjectRequest);
+    }
+
+    private void openNewsDialog(JSONObject newsItem) throws JSONException {
+        final Dialog dialog = new Dialog(this);
+        dialog.setContentView(R.layout.news_dialog);
+
+        ImageView imageViewNewsDialog = (ImageView) dialog.findViewById(R.id.imageViewNewsDialog);
+        TextView textViewNewsDialogTitle = (TextView) dialog.findViewById(R.id.textViewNewsDialogTitle);
+        ImageView imageViewTwitter = (ImageView) dialog.findViewById(R.id.imageViewTwitter);
+        ImageView imageViewChrome = (ImageView) dialog.findViewById(R.id.imageViewChrome);
+
+        Log.d(TAG, "openNewsDialog: " + imageViewNewsDialog);
+        String urlToImage = newsItem.getString("urlToImage");
+        String title = newsItem.getString("title");
+        final String url = newsItem.getString("url");
+        final String urlTwitter = "https://twitter.com/intent/tweet?"
+                + "text=Check out this Link:%0A" + url;
+        Glide.with(this)
+                .load(urlToImage)
+                .centerCrop()
+                .into(imageViewNewsDialog);
+        textViewNewsDialogTitle.setText(title);
+
+        imageViewTwitter.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(urlTwitter));
+                startActivity(browserIntent);
+            }
+        });
+
+        imageViewChrome.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                startActivity(browserIntent);
+            }
+        });
+
+        dialog.show();
     }
 
     public static String calTimeDiff(String publishedAt) throws ParseException {

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                                                   xmlns:app="http://schemas.android.com/apk/res-auto"
+                                                   xmlns:tools="http://schemas.android.com/tools"
+                                                   android:layout_width="300dp"
+                                                   android:layout_height="wrap_content">
+
+    <ImageView
+            android:layout_width="0dp"
+            android:layout_height="200dp" tools:srcCompat="@tools:sample/avatars" android:id="@+id/imageViewNewsDialog"
+            app:layout_constraintTop_toTopOf="parent" app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
+    <TextView
+            android:text="TextView"
+            android:layout_width="0dp"
+            android:layout_height="100dp" android:id="@+id/textViewNewsDialogTitle"
+            app:layout_constraintTop_toBottomOf="@+id/imageViewNewsDialog" app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
+    <ImageView
+            android:layout_width="60dp"
+            android:layout_height="60dp" app:srcCompat="@drawable/bluetwitter" android:id="@+id/imageViewTwitter"
+            android:scaleType="fitCenter"
+            app:layout_constraintTop_toBottomOf="@+id/textViewNewsDialogTitle"
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginStart="70dp"/>
+    <ImageView
+            android:layout_width="60dp"
+            android:layout_height="60dp" app:srcCompat="@drawable/ic_chrome" android:id="@+id/imageViewChrome"
+            android:scaleType="fitCenter"
+            app:layout_constraintTop_toBottomOf="@+id/textViewNewsDialogTitle" app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginEnd="70dp"/>
+</androidx.constraintlayout.widget.ConstraintLayout>
