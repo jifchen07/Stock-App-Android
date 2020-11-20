@@ -11,6 +11,8 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import androidx.appcompat.widget.Toolbar;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -70,11 +72,15 @@ public class DetailActivity extends AppCompatActivity {
 
     ExpandableTextView expTv1;
 
-    List<JSONObject> newsItems;
+    ArrayList<JSONObject> newsItems;
     ImageView firstNewsImageView;
     TextView firstNewsSourceTextView;
     TextView firstNewsDateTextView;
     TextView firstNewsTitleTextView;
+
+    RecyclerView recyclerView;
+    RecyclerView.LayoutManager layoutManager;
+    RecyclerView.Adapter newsAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -124,6 +130,7 @@ public class DetailActivity extends AppCompatActivity {
         gridViewStats.setAdapter(gridViewAdapter);
 
 
+
     }
 
     private void findViews() {
@@ -142,6 +149,9 @@ public class DetailActivity extends AppCompatActivity {
         firstNewsSourceTextView = (TextView) findViewById(R.id.textViewFirstNewsSource);
         firstNewsDateTextView = (TextView) findViewById(R.id.textViewFirstNewsDate);
         firstNewsTitleTextView = (TextView) findViewById(R.id.textViewFirstNewsTitle);
+
+        recyclerView = (RecyclerView) findViewById(R.id.recyclerViewNews);
+
     }
 
     private void renderViews() {
@@ -247,12 +257,12 @@ public class DetailActivity extends AppCompatActivity {
                             newsItems = new ArrayList<>();
                             JSONArray articles = response.getJSONArray("articles");
                             JSONObject object;
-                            for (int i = 0; i < articles.length(); i++) {
+                            for (int i = 1; i < articles.length(); i++) {
                                 object = articles.getJSONObject(i);
                                 newsItems.add(object);
                             }
 
-                            JSONObject firstNews = newsItems.get(0);
+                            JSONObject firstNews = articles.getJSONObject(0);
                             Glide.with(getApplicationContext())
                                     .load(firstNews.getString("urlToImage"))
                                     .centerCrop()
@@ -264,7 +274,10 @@ public class DetailActivity extends AppCompatActivity {
                             firstNewsDateTextView
                                     .setText(calTimeDiff(firstNews.getString("publishedAt")));
 
-
+                            layoutManager = new LinearLayoutManager(getApplicationContext());
+                            newsAdapter = new NewsCardAdapter(getApplicationContext(), newsItems);
+                            recyclerView.setLayoutManager(layoutManager);
+                            recyclerView.setAdapter(newsAdapter);
 
                         } catch (JSONException | ParseException e) {
                             e.printStackTrace();

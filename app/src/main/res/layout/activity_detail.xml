@@ -144,12 +144,12 @@
             </androidx.constraintlayout.widget.ConstraintLayout>
             <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
-                    android:layout_height="400dp">
+                    android:layout_height="wrap_content">
 
                 <TextView
                         android:text="News"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content" android:id="@+id/textView"
+                        android:layout_height="wrap_content" android:id="@+id/textViewNewsSource"
                         app:layout_constraintTop_toTopOf="parent" app:layout_constraintStart_toStartOf="parent"
                         android:textAppearance="@style/TextAppearance.AppCompat.Large"/>
                 <androidx.cardview.widget.CardView
@@ -157,7 +157,8 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         app:layout_constraintStart_toStartOf="parent" app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/textView" android:layout_marginTop="8dp">
+                        app:layout_constraintTop_toBottomOf="@+id/textViewNewsSource" android:layout_marginTop="8dp"
+                        android:id="@+id/cardView2">
                     <androidx.constraintlayout.widget.ConstraintLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
@@ -196,6 +197,11 @@
                                 app:layout_constraintEnd_toEndOf="parent"/>
                     </androidx.constraintlayout.widget.ConstraintLayout>
                 </androidx.cardview.widget.CardView>
+                <androidx.recyclerview.widget.RecyclerView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content" app:layout_constraintTop_toBottomOf="@+id/cardView2"
+                        app:layout_constraintStart_toStartOf="parent" app:layout_constraintEnd_toEndOf="parent"
+                        android:id="@+id/recyclerViewNews"/>
             </androidx.constraintlayout.widget.ConstraintLayout>
         </LinearLayout>
     </ScrollView>
