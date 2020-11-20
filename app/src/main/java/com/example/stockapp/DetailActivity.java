@@ -1,6 +1,7 @@
 package com.example.stockapp;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.util.Log;
 import android.view.View;
 import android.webkit.WebView;
@@ -34,7 +35,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class DetailActivity extends AppCompatActivity {
+public class DetailActivity extends AppCompatActivity implements NewsCardAdapter.OnNewsListener {
     private static final String TAG = "DetailActivity";
     private Stock stock;
     private MyApplication appData;
@@ -72,7 +73,7 @@ public class DetailActivity extends AppCompatActivity {
 
     ExpandableTextView expTv1;
 
-    ArrayList<JSONObject> newsItems;
+    ArrayList<JSONObject> newsItems = new ArrayList<>();
     ImageView firstNewsImageView;
     TextView firstNewsSourceTextView;
     TextView firstNewsDateTextView;
@@ -129,6 +130,10 @@ public class DetailActivity extends AppCompatActivity {
         gridViewAdapter = new GridViewAdapter(getApplicationContext(), gridData);
         gridViewStats.setAdapter(gridViewAdapter);
 
+        layoutManager = new LinearLayoutManager(getApplicationContext());
+        newsAdapter = new NewsCardAdapter(getApplicationContext(), newsItems, this);
+        recyclerView.setLayoutManager(layoutManager);
+        recyclerView.setAdapter(newsAdapter);
 
 
     }
@@ -254,7 +259,7 @@ public class DetailActivity extends AppCompatActivity {
                     @Override
                     public void onResponse(JSONObject response) {
                         try {
-                            newsItems = new ArrayList<>();
+                            newsItems.clear();
                             JSONArray articles = response.getJSONArray("articles");
                             JSONObject object;
                             for (int i = 1; i < articles.length(); i++) {
@@ -274,10 +279,11 @@ public class DetailActivity extends AppCompatActivity {
                             firstNewsDateTextView
                                     .setText(calTimeDiff(firstNews.getString("publishedAt")));
 
-                            layoutManager = new LinearLayoutManager(getApplicationContext());
-                            newsAdapter = new NewsCardAdapter(getApplicationContext(), newsItems);
-                            recyclerView.setLayoutManager(layoutManager);
-                            recyclerView.setAdapter(newsAdapter);
+                            newsAdapter.notifyDataSetChanged();
+//                            layoutManager = new LinearLayoutManager(getApplicationContext());
+//                            newsAdapter = new NewsCardAdapter(getApplicationContext(), newsItems);
+//                            recyclerView.setLayoutManager(layoutManager);
+//                            recyclerView.setAdapter(newsAdapter);
 
                         } catch (JSONException | ParseException e) {
                             e.printStackTrace();
@@ -307,5 +313,11 @@ public class DetailActivity extends AppCompatActivity {
         } else {
             return String.format("%d minutes ago", minutes);
         }
+    }
+
+    @Override
+    public void onNewsClick(String url) {
+        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+        startActivity(browserIntent);
     }
 }

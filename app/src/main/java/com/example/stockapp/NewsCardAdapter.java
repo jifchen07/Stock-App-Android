@@ -19,10 +19,12 @@ import java.util.ArrayList;
 public class NewsCardAdapter extends RecyclerView.Adapter<NewsCardAdapter.NewsViewHolder> {
     private ArrayList<JSONObject> newsItems;
     private Context context;
+    private OnNewsListener mOnNewsListener;
 
-    public NewsCardAdapter(Context context, ArrayList<JSONObject> newsItems) {
+    public NewsCardAdapter(Context context, ArrayList<JSONObject> newsItems, OnNewsListener onNewsListener) {
         this.context = context;
         this.newsItems = newsItems;
+        this.mOnNewsListener = onNewsListener;
     }
 
     @NonNull
@@ -31,7 +33,7 @@ public class NewsCardAdapter extends RecyclerView.Adapter<NewsCardAdapter.NewsVi
     public NewsViewHolder onCreateViewHolder(@NonNull @NotNull ViewGroup parent, int viewType) {
         LayoutInflater layoutInflater = LayoutInflater.from(parent.getContext());
         View view = layoutInflater.inflate(R.layout.news_card_item, parent, false);
-        return new NewsViewHolder(view);
+        return new NewsViewHolder(view, mOnNewsListener);
     }
 
     @Override
@@ -56,17 +58,38 @@ public class NewsCardAdapter extends RecyclerView.Adapter<NewsCardAdapter.NewsVi
         return newsItems.size();
     }
 
-    public static class NewsViewHolder extends RecyclerView.ViewHolder {
+    public class NewsViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         TextView textViewNewsSource, textViewNewsDate, textViewNewsTitle;
         ImageView imageViewNews;
-        public NewsViewHolder(@NonNull @NotNull View itemView) {
+        OnNewsListener onNewsListener;
+
+        public NewsViewHolder(@NonNull @NotNull View itemView, OnNewsListener onNewsListener) {
             super(itemView);
 
             textViewNewsSource = itemView.findViewById(R.id.textViewNewsSource);
             textViewNewsDate = itemView.findViewById(R.id.textViewNewsDate);
             textViewNewsTitle = itemView.findViewById(R.id.textViewNewsTitle);
             imageViewNews = itemView.findViewById(R.id.imageViewNews);
+
+            this.onNewsListener = onNewsListener;
+
+            itemView.setOnClickListener(this);
         }
+
+        @Override
+        public void onClick(View v) {
+            int position = getAdapterPosition();
+            try {
+                String url = newsItems.get(position).getString("url");
+                onNewsListener.onNewsClick(url);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public interface OnNewsListener {
+        void onNewsClick(String url);
     }
 
 }
