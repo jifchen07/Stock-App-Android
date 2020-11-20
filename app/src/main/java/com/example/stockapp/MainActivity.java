@@ -105,7 +105,11 @@ public class MainActivity extends AppCompatActivity implements ChildRecyclerAdap
                     public void onItemClick(AdapterView<?> parent, View view,
                                             int position, long id) {
 //                        selectedText.setText(autoSuggestAdapter.getObject(position));
-                        Log.d(TAG, "onItemClick: " + autoSuggestAdapter.getObject(position));
+                        String line = autoSuggestAdapter.getObject(position);
+                        String ticker = line.split(" - ")[0];
+                        Intent intent = new Intent(getApplicationContext(), DetailActivity.class);
+                        intent.putExtra(EXTRA_TICKER, ticker);
+                        startActivity(intent);
                     }
                 });
         autoCompleteTextView.addTextChangedListener(new TextWatcher() {
