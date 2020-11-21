@@ -21,6 +21,7 @@ import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
+import androidx.core.view.MenuItemCompat;
 import androidx.recyclerview.widget.RecyclerView;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -57,6 +58,8 @@ public class MainActivity extends AppCompatActivity implements ChildRecyclerAdap
     Map<String, Stock> stockSet;
     ArrayList<String> portfolioList;
     ArrayList<String> watchList;
+    ArrayList<Stock> portfolioStockList;
+    ArrayList<Stock> watchListStockList;
 
     MainRecyclerAdapter mainRecyclerAdapter;
 
@@ -64,6 +67,7 @@ public class MainActivity extends AppCompatActivity implements ChildRecyclerAdap
     MyApplication appData;
 
     SearchView searchView;
+    SearchView.SearchAutoComplete searchAutoComplete;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,7 +93,7 @@ public class MainActivity extends AppCompatActivity implements ChildRecyclerAdap
 //        }, 15000, 15000);
 
         // for auto complete
-        autoComplete();
+//        autoComplete();
 
     }
 
@@ -97,6 +101,10 @@ public class MainActivity extends AppCompatActivity implements ChildRecyclerAdap
     public boolean onCreateOptionsMenu(Menu menu) {
             MenuInflater inflater = getMenuInflater();
             inflater.inflate(R.menu.main, menu);
+            MenuItem item = menu.findItem(R.id.action_search);
+            searchView = (SearchView) item.getActionView();
+            searchAutoComplete = searchView.findViewById(com.google.android.material.R.id.search_src_text);
+            autoComplete();
             return true;
     }
 
@@ -106,17 +114,16 @@ public class MainActivity extends AppCompatActivity implements ChildRecyclerAdap
     }
 
     private void autoComplete() {
-        final AppCompatAutoCompleteTextView autoCompleteTextView =
-                findViewById(R.id.auto_complete_edit_text);
-//        final TextView selectedText = findViewById(R.id.selected_item);
+//        final AppCompatAutoCompleteTextView autoCompleteTextView =
+//                findViewById(R.id.auto_complete_edit_text);
 
 
         //Setting up the adapter for AutoSuggest
         autoSuggestAdapter = new AutoSuggestAdapter(this,
                 android.R.layout.simple_dropdown_item_1line);
-        autoCompleteTextView.setThreshold(2);
-        autoCompleteTextView.setAdapter(autoSuggestAdapter);
-        autoCompleteTextView.setOnItemClickListener(
+        searchAutoComplete.setThreshold(2);
+        searchAutoComplete.setAdapter(autoSuggestAdapter);
+        searchAutoComplete.setOnItemClickListener(
                 new AdapterView.OnItemClickListener() {
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view,
@@ -129,7 +136,7 @@ public class MainActivity extends AppCompatActivity implements ChildRecyclerAdap
                         startActivity(intent);
                     }
                 });
-        autoCompleteTextView.addTextChangedListener(new TextWatcher() {
+        searchAutoComplete.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int
                     count, int after) {
@@ -149,8 +156,8 @@ public class MainActivity extends AppCompatActivity implements ChildRecyclerAdap
             @Override
             public boolean handleMessage(Message msg) {
                 if (msg.what == TRIGGER_AUTO_COMPLETE) {
-                    if (!TextUtils.isEmpty(autoCompleteTextView.getText())) {
-                        makeApiCall(autoCompleteTextView.getText().toString());
+                    if (!TextUtils.isEmpty(searchAutoComplete.getText())) {
+                        makeApiCall(searchAutoComplete.getText().toString());
                     }
                 }
                 return false;
