@@ -14,14 +14,11 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.TextView;
 import androidx.annotation.NonNull;
-import androidx.appcompat.widget.AppCompatAutoCompleteTextView;
 import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
-import androidx.core.view.MenuItemCompat;
 import androidx.recyclerview.widget.RecyclerView;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -39,7 +36,7 @@ import java.lang.reflect.Type;
 import java.util.*;
 //import android.support.v7.app.AppCompatActivity;
 
-public class MainActivity extends AppCompatActivity implements ChildRecyclerAdapter.OnArrowClick {
+public class MainActivity extends AppCompatActivity implements StockListRecyclerAdapter.OnArrowClickListener {
 
     public static final String EXTRA_TICKER = "com.example.stockapp.EXTRA_TICKER";
 
@@ -52,22 +49,28 @@ public class MainActivity extends AppCompatActivity implements ChildRecyclerAdap
     private AutoSuggestAdapter autoSuggestAdapter;
 
     // for section recycler view
-    List<Section> sectionList = new ArrayList<>();
-    RecyclerView mainRecyclerView;
+//    List<Section> sectionList = new ArrayList<>();
+//    RecyclerView mainRecyclerView;
 
     Map<String, Stock> stockSet;
     ArrayList<String> portfolioList;
     ArrayList<String> watchList;
-    ArrayList<Stock> portfolioStockList;
-    ArrayList<Stock> watchListStockList;
+    ArrayList<Stock> portfolioStockList = new ArrayList<>();
+    ArrayList<Stock> favoritesStockList = new ArrayList<>();
 
-    MainRecyclerAdapter mainRecyclerAdapter;
+//    MainRecyclerAdapter mainRecyclerAdapter;
+
 
     // for application data
     MyApplication appData;
 
     SearchView searchView;
     SearchView.SearchAutoComplete searchAutoComplete;
+
+    StockListRecyclerAdapter portfolioRecyclerAdapter;
+    StockListRecyclerAdapter favoritesRecyclerAdapter;
+    RecyclerView portfolioRecyclerView;
+    RecyclerView favoritesRecyclerView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,9 +83,12 @@ public class MainActivity extends AppCompatActivity implements ChildRecyclerAdap
         // initData();
         loadData();
 
-        mainRecyclerView = findViewById(R.id.mainRecyclerView);
-        mainRecyclerAdapter = new MainRecyclerAdapter(sectionList, this);
-        mainRecyclerView.setAdapter(mainRecyclerAdapter);
+        portfolioRecyclerView = findViewById(R.id.portfolioRecyclerView);
+        favoritesRecyclerView = findViewById(R.id.favoritesRecyclerView);
+        portfolioRecyclerAdapter = new StockListRecyclerAdapter(portfolioStockList, this);
+        favoritesRecyclerAdapter = new StockListRecyclerAdapter(favoritesStockList, this);
+        portfolioRecyclerView.setAdapter(portfolioRecyclerAdapter);
+        favoritesRecyclerView.setAdapter(favoritesRecyclerAdapter);
 
         // update the price data every 15 seconds
 //        new Timer().scheduleAtFixedRate(new TimerTask() {
@@ -92,8 +98,7 @@ public class MainActivity extends AppCompatActivity implements ChildRecyclerAdap
 //            }
 //        }, 15000, 15000);
 
-        // for auto complete
-//        autoComplete();
+
 
     }
 
@@ -121,7 +126,7 @@ public class MainActivity extends AppCompatActivity implements ChildRecyclerAdap
         //Setting up the adapter for AutoSuggest
         autoSuggestAdapter = new AutoSuggestAdapter(this,
                 android.R.layout.simple_dropdown_item_1line);
-        searchAutoComplete.setThreshold(2);
+        searchAutoComplete.setThreshold(3);
         searchAutoComplete.setAdapter(autoSuggestAdapter);
         searchAutoComplete.setOnItemClickListener(
                 new AdapterView.OnItemClickListener() {
@@ -201,35 +206,6 @@ public class MainActivity extends AppCompatActivity implements ChildRecyclerAdap
     }
 
 
-    private void loadData2() {
-        SharedPreferences sharedPreferences = getSharedPreferences("shared preferences", MODE_PRIVATE);
-        Gson gson = new Gson();
-        String json = sharedPreferences.getString("section one", null);
-        Type type = new TypeToken<ArrayList<Stock>>(){}.getType();
-        List<Stock> sectionOneItems = gson.fromJson(json, type);
-
-        if (sectionOneItems == null) {
-            sectionOneItems = new ArrayList<>();
-            sectionOneItems.add(new Stock("AAPL", "Apple Inc", 108.86, 5, true, -6.46, 500));
-            sectionOneItems.add(new Stock("TSLA", "Tesla Inc", 388.04, 3, true, -22.79, 1000));
-        }
-
-        String json2 = sharedPreferences.getString("section two", null);
-        List<Stock> sectionTwoItems = gson.fromJson(json2, type);
-
-        if (sectionTwoItems == null) {
-            sectionTwoItems = new ArrayList<>();
-            sectionTwoItems.add(new Stock("NFLX", "NetFlix Inc", 100.00, 0, true, -5.55, 0));
-            sectionTwoItems.add(new Stock("AAPL", "Apple Inc", 108.86, 5, true, -6.46, 500));
-            sectionTwoItems.add(new Stock("TSLA", "Tesla Inc", 388.04, 3, true, -22.79, 1000));
-        }
-
-        String sectionOneName = "PORTFOLIO";
-        String sectionTwoName = "FAVORITES";
-        sectionList.add(new Section(sectionOneName, sectionOneItems));
-        sectionList.add(new Section(sectionTwoName, sectionTwoItems));
-    }
-
     // load data from shared preference
     private void loadData() {
         SharedPreferences sharedPreferences = getSharedPreferences("shared preferences", MODE_PRIVATE);
@@ -265,7 +241,7 @@ public class MainActivity extends AppCompatActivity implements ChildRecyclerAdap
 
         saveData();
 
-        updateSectionList();
+        updateStockLists();
 
         passDataToApplication();
     }
@@ -277,21 +253,14 @@ public class MainActivity extends AppCompatActivity implements ChildRecyclerAdap
         appData.setWatchList(watchList);
     }
 
-    private void updateSectionList() {
-        String sectionOneName = "PORTFOLIO";
-        String sectionTwoName = "FAVORITES";
-        List<Stock> sectionOneItems = new ArrayList<>();
-        List<Stock> sectionTwoItems = new ArrayList<>();
+    private void updateStockLists() {
+
         for (int i = 0; i < portfolioList.size(); i++) {
-            sectionOneItems.add(stockSet.get(portfolioList.get(i)));
+            portfolioStockList.add(stockSet.get(portfolioList.get(i)));
         }
         for (int i = 0; i < watchList.size(); i++) {
-            sectionTwoItems.add(stockSet.get(watchList.get(i)));
+            favoritesStockList.add(stockSet.get(watchList.get(i)));
         }
-
-        sectionList = new ArrayList<Section>();
-        sectionList.add(new Section(sectionOneName, sectionOneItems));
-        sectionList.add(new Section(sectionTwoName, sectionTwoItems));
     }
 
     private void saveData() {
@@ -334,7 +303,8 @@ public class MainActivity extends AppCompatActivity implements ChildRecyclerAdap
                                 stockSet.get(ticker).setChange(change);
                             }
                             Log.d(TAG, "onResponse: " + stockSet.get("AAPL").getLastPrice());
-                            mainRecyclerAdapter.notifyDataSetChanged();
+                            portfolioRecyclerAdapter.notifyDataSetChanged();
+                            favoritesRecyclerAdapter.notifyDataSetChanged();
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
