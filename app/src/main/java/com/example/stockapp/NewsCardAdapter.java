@@ -9,6 +9,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
+import com.google.gson.JsonObject;
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -58,7 +59,8 @@ public class NewsCardAdapter extends RecyclerView.Adapter<NewsCardAdapter.NewsVi
         return newsItems.size();
     }
 
-    public class NewsViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    public class NewsViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener
+    {
         TextView textViewNewsSource, textViewNewsDate, textViewNewsTitle;
         ImageView imageViewNews;
         OnNewsListener onNewsListener;
@@ -74,6 +76,7 @@ public class NewsCardAdapter extends RecyclerView.Adapter<NewsCardAdapter.NewsVi
             this.onNewsListener = onNewsListener;
 
             itemView.setOnClickListener(this);
+            itemView.setOnLongClickListener(this);
         }
 
         @Override
@@ -86,10 +89,19 @@ public class NewsCardAdapter extends RecyclerView.Adapter<NewsCardAdapter.NewsVi
                 e.printStackTrace();
             }
         }
+
+        @Override
+        public boolean onLongClick(View v) {
+            int position = getAdapterPosition();
+            JSONObject newsItem = newsItems.get(position);
+            onNewsListener.onNewsLongClick(newsItem);
+            return true;
+        }
     }
 
     public interface OnNewsListener {
         void onNewsClick(String url);
+        void onNewsLongClick(JSONObject newsItem);
     }
 
 }

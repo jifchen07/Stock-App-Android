@@ -345,29 +345,21 @@ public class DetailActivity extends AppCompatActivity implements NewsCardAdapter
                                     .setText(firstNews.getString("title"));
                             firstNewsDateTextView
                                     .setText(calTimeDiff(firstNews.getString("publishedAt")));
+                            final String newsUrl = firstNews.getString("url");
+
                             CardView firstNewsCardView = (CardView) findViewById(R.id.cardViewFirstNews);
                             firstNewsCardView.setOnClickListener(new View.OnClickListener() {
 
                                 @Override
                                 public void onClick(View v) {
-                                    Intent browserIntent = null;
-                                    try {
-                                        browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(firstNews.getString("url")));
-                                        startActivity(browserIntent);
-                                    } catch (JSONException e) {
-                                        e.printStackTrace();
-                                    }
+                                    onNewsClick(newsUrl);
                                 }
                             });
                             firstNewsCardView.setOnLongClickListener(new View.OnLongClickListener() {
 
                                 @Override
                                 public boolean onLongClick(View v) {
-                                    try {
-                                        openNewsDialog(firstNews);
-                                    } catch (JSONException e) {
-                                        e.printStackTrace();
-                                    }
+                                    onNewsLongClick(firstNews);
                                     return true;
                                 }
                             });
@@ -401,7 +393,6 @@ public class DetailActivity extends AppCompatActivity implements NewsCardAdapter
         ImageView imageViewTwitter = (ImageView) dialog.findViewById(R.id.imageViewTwitter);
         ImageView imageViewChrome = (ImageView) dialog.findViewById(R.id.imageViewChrome);
 
-        Log.d(TAG, "openNewsDialog: " + imageViewNewsDialog);
         String urlToImage = newsItem.getString("urlToImage");
         String title = newsItem.getString("title");
         final String url = newsItem.getString("url");
@@ -454,5 +445,14 @@ public class DetailActivity extends AppCompatActivity implements NewsCardAdapter
     public void onNewsClick(String url) {
         Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
         startActivity(browserIntent);
+    }
+
+    @Override
+    public void onNewsLongClick(JSONObject newsItem) {
+        try {
+            openNewsDialog(newsItem);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 }
