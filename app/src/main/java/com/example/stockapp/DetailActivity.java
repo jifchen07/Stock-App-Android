@@ -4,12 +4,15 @@ import android.app.Dialog;
 import android.content.Intent;
 import android.net.Uri;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import androidx.appcompat.widget.Toolbar;
@@ -87,6 +90,8 @@ public class DetailActivity extends AppCompatActivity implements NewsCardAdapter
     RecyclerView.LayoutManager layoutManager;
     RecyclerView.Adapter newsAdapter;
 
+    boolean isFav;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -115,8 +120,10 @@ public class DetailActivity extends AppCompatActivity implements NewsCardAdapter
         stockSet = appData.getStockSet();
         if (stockSet.containsKey(ticker)) {
             stock = stockSet.get(ticker);
+            isFav = stock.isFavorite() ? true : false;
         } else {
             stock = new Stock(ticker, "", 0.0, 0, false, 0.0,0.0);
+            isFav = false;
         }
 
 
@@ -144,6 +151,42 @@ public class DetailActivity extends AppCompatActivity implements NewsCardAdapter
         newsAdapter = new NewsCardAdapter(getApplicationContext(), newsItems, this);
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(newsAdapter);
+
+
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.favorite, menu);
+
+        return true;
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        MenuItem fav = menu.findItem(R.id.favorite);
+        MenuItem unfav = menu.findItem(R.id.unFavorite);
+
+        fav.setVisible(isFav);
+        unfav.setVisible(!isFav);
+
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.favorite:
+                isFav = false;
+                supportInvalidateOptionsMenu();
+                return true;
+            case R.id.unFavorite:
+                isFav = true;
+                supportInvalidateOptionsMenu();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
 
 
     }
