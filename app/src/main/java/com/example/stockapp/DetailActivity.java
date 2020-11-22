@@ -92,6 +92,9 @@ public class DetailActivity extends AppCompatActivity implements NewsCardAdapter
 
     boolean isFav;
 
+    ArrayList<Stock> favoritesStockList;
+    ArrayList<Stock> portfolioStockList;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -118,6 +121,9 @@ public class DetailActivity extends AppCompatActivity implements NewsCardAdapter
 
         appData = (MyApplication) getApplicationContext();
         stockSet = appData.getStockSet();
+        favoritesStockList = appData.getFavoritesStockList();
+        portfolioStockList = appData.getPortfolioStockList();
+
         if (stockSet.containsKey(ticker)) {
             stock = stockSet.get(ticker);
             isFav = stock.isFavorite() ? true : false;
@@ -126,10 +132,6 @@ public class DetailActivity extends AppCompatActivity implements NewsCardAdapter
             isFav = false;
         }
 
-
-        Log.d(TAG, "onCreate: " + stock.getTicker());
-        Log.d(TAG, "onCreate: " + appData.getPortfolioList());
-        Log.d(TAG, "onCreate: " + appData.getWatchList());
 
         queue = Volley.newRequestQueue(getApplicationContext());
 
@@ -178,10 +180,24 @@ public class DetailActivity extends AppCompatActivity implements NewsCardAdapter
         switch (item.getItemId()) {
             case R.id.favorite:
                 isFav = false;
+                Stock stock = stockSet.get(ticker);
+                favoritesStockList.remove(stock);
+                if (stock.getNumOfShares() == 0) {
+                    stockSet.remove(ticker);
+                } else {
+                    stockSet.get(ticker).setFavorite(false);
+                }
                 supportInvalidateOptionsMenu();
                 return true;
             case R.id.unFavorite:
                 isFav = true;
+                this.stock.setFavorite(true);
+                favoritesStockList.add(this.stock);
+                if (stockSet.containsKey(ticker)) {
+                    stockSet.get(ticker).setFavorite(true);
+                } else {
+                    stockSet.put(ticker, this.stock);
+                }
                 supportInvalidateOptionsMenu();
                 return true;
             default:
@@ -212,12 +228,6 @@ public class DetailActivity extends AppCompatActivity implements NewsCardAdapter
 
     }
 
-    private void renderViews() {
-        tickerTextView.setText(ticker);
-        nameTextView.setText(name);
-        lastPriceTextView.setText(Double.toString(lastPrice));
-        changeTextView.setText(Double.toString(changePrice));
-    }
 
     private void fetchDescription() {
         String url = "https://stock-search-backend-110320.wl.r.appspot.com/search/description/" + ticker;
@@ -230,6 +240,7 @@ public class DetailActivity extends AppCompatActivity implements NewsCardAdapter
                     public void onResponse(JSONObject response) {
                         try {
                             name = response.getString("name");
+                            stock.setName(name);
                             description = response.getString("description");
 
                             nameTextView.setText(name);
@@ -263,6 +274,9 @@ public class DetailActivity extends AppCompatActivity implements NewsCardAdapter
                             JSONObject data = response.getJSONObject(0);
                             lastPrice = data.getDouble("last");
                             changePrice = lastPrice - data.getDouble("prevClose");
+                            stock.setLastPrice(lastPrice);
+                            stock.setChange(changePrice);
+
                             lowPrice = data.isNull("low") ? null : data.getDouble("low");
                             midPrice = data.isNull("mid") ? null : data.getDouble("mid");
                             highPrice = data.isNull("high") ? null : data.getDouble("high");

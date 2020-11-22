@@ -72,6 +72,8 @@ public class MainActivity extends AppCompatActivity implements StockListRecycler
     RecyclerView portfolioRecyclerView;
     RecyclerView favoritesRecyclerView;
 
+    boolean loaded = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -116,6 +118,17 @@ public class MainActivity extends AppCompatActivity implements StockListRecycler
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (!loaded) {
+            loaded = true;
+        } else {
+            portfolioRecyclerAdapter.notifyDataSetChanged();
+            favoritesRecyclerAdapter.notifyDataSetChanged();
+        }
     }
 
     private void autoComplete() {
@@ -249,8 +262,8 @@ public class MainActivity extends AppCompatActivity implements StockListRecycler
     private void passDataToApplication() {
         appData = (MyApplication) getApplicationContext();
         appData.setStockSet(stockSet);
-        appData.setPortfolioList(portfolioList);
-        appData.setWatchList(watchList);
+        appData.setFavoritesStockList(favoritesStockList);
+        appData.setPortfolioStockList(portfolioStockList);
     }
 
     private void updateStockLists() {
@@ -275,6 +288,8 @@ public class MainActivity extends AppCompatActivity implements StockListRecycler
         editor.putString("watchlist", json_watchlist);
         editor.apply();
     }
+
+
 
     private void updatePrice() {
         List<String> tickers = new ArrayList<>(stockSet.keySet());

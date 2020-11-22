@@ -2,13 +2,14 @@ package com.example.stockapp;
 
 import android.app.Application;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Map;
 
 public class MyApplication extends Application {
     private Map<String, Stock> stockSet;
-    private ArrayList<String> portfolioList;
-    private ArrayList<String> watchList;
+    private ArrayList<Stock> portfolioStockList;
+    private ArrayList<Stock> favoritesStockList;
 
     public Map<String, Stock> getStockSet() {
         return stockSet;
@@ -18,19 +19,19 @@ public class MyApplication extends Application {
         this.stockSet = stockSet;
     }
 
-    public ArrayList<String> getPortfolioList() {
-        return portfolioList;
+    public ArrayList<Stock> getPortfolioStockList() {
+        return portfolioStockList;
     }
 
-    public void setPortfolioList(ArrayList<String> portfolioList) {
-        this.portfolioList = portfolioList;
+    public void setPortfolioStockList(ArrayList<Stock> portfolioStockList) {
+        this.portfolioStockList = portfolioStockList;
     }
 
-    public ArrayList<String> getWatchList() {
-        return watchList;
+    public ArrayList<Stock> getFavoritesStockList() {
+        return favoritesStockList;
     }
 
-    public void setWatchList(ArrayList<String> watchList) {
-        this.watchList = watchList;
+    public void setFavoritesStockList(ArrayList<Stock> favoritesStockList) {
+        this.favoritesStockList = favoritesStockList;
     }
 }
