@@ -1,5 +1,6 @@
 package com.example.stockapp;
 
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,11 +11,13 @@ import androidx.recyclerview.widget.RecyclerView;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
-public class StockListRecyclerAdapter extends RecyclerView.Adapter<StockListRecyclerAdapter.ViewHolder> {
+public class StockListRecyclerAdapter extends RecyclerView.Adapter<StockListRecyclerAdapter.ViewHolder> implements ItemMoveCallback.ItemTouchHelperContract{
 
     ArrayList<Stock> items;
     private OnArrowClickListener onArrowClickListener;
+
 
     public StockListRecyclerAdapter(ArrayList<Stock> items, OnArrowClickListener onArrowClickListener) {
         this.items = items;
@@ -48,9 +51,34 @@ public class StockListRecyclerAdapter extends RecyclerView.Adapter<StockListRecy
         return items.size();
     }
 
+    @Override
+    public void onRowMoved(int fromPosition, int toPosition) {
+        if (fromPosition < toPosition) {
+            for (int i = fromPosition; i < toPosition; i++) {
+                Collections.swap(items, i, i + 1);
+            }
+        } else {
+            for (int i = fromPosition; i > toPosition; i--) {
+                Collections.swap(items, i, i - 1);
+            }
+        }
+        notifyItemMoved(fromPosition, toPosition);
+    }
+
+    @Override
+    public void onRowSelected(StockListRecyclerAdapter.ViewHolder myViewHolder) {
+        myViewHolder.rowView.setBackgroundColor(Color.GRAY);
+    }
+
+    @Override
+    public void onRowClear(StockListRecyclerAdapter.ViewHolder myViewHolder) {
+        myViewHolder.rowView.setBackgroundColor(Color.WHITE);
+    }
+
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         TextView itemTextViewUL, itemTextViewUR, itemTextViewLL, itemTextViewLR;
         ImageView imageView;
+        View rowView;
 
         OnArrowClickListener onArrowClickListener;
 
@@ -65,6 +93,8 @@ public class StockListRecyclerAdapter extends RecyclerView.Adapter<StockListRecy
             this.onArrowClickListener = onArrowClickListener;
 
             imageView.setOnClickListener(this);
+
+            rowView = itemView;
         }
 
         @Override
