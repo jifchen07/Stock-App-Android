@@ -111,6 +111,7 @@ public class StockListRecyclerAdapter extends RecyclerView.Adapter<StockListRecy
     }
 
     public void removeItem(int position) {
+        items.get(position).setFavorite(false);
         items.remove(position);
         notifyItemRemoved(position);
     }

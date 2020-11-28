@@ -355,6 +355,9 @@ public class DetailActivity extends AppCompatActivity implements NewsCardAdapter
                         dialog.dismiss();
                         updateInfo();
                         openSuccessDialog("sold", num, ticker);
+                        appData.saveFreeMoney();
+                        appData.saveStockSet();
+                        appData.savePortfolio();
                     }
 
                 } catch (NumberFormatException e) {
@@ -629,5 +632,5 @@ public class DetailActivity extends AppCompatActivity implements NewsCardAdapter
             e.printStackTrace();
         }
     }
-    
+
 }

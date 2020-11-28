@@ -381,6 +381,7 @@ public class MainActivity extends AppCompatActivity implements StockListRecycler
             public void onSwiped(@NonNull @NotNull RecyclerView.ViewHolder viewHolder, int direction) {
                 final int position = viewHolder.getAdapterPosition();
                 favoritesRecyclerAdapter.removeItem(position);
+                appData.saveWatchList();
             }
         };
 
