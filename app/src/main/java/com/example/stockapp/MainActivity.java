@@ -285,6 +285,7 @@ public class MainActivity extends AppCompatActivity implements StockListRecycler
 
     private void passDataToApplication() {
         appData = (MyApplication) getApplicationContext();
+        appData.init();
         appData.setStockSet(stockSet);
         appData.setFavoritesStockList(favoritesStockList);
         appData.setPortfolioStockList(portfolioStockList);

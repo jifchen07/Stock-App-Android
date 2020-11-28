@@ -97,8 +97,8 @@ public class DetailActivity extends AppCompatActivity implements NewsCardAdapter
 
     Toast toast;
 
-    SharedPreferences.Editor editor;
-    Gson gson;
+//    SharedPreferences.Editor editor;
+//    Gson gson;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -140,9 +140,9 @@ public class DetailActivity extends AppCompatActivity implements NewsCardAdapter
 
         queue = Volley.newRequestQueue(getApplicationContext());
 
-        SharedPreferences sharedPreferences = getSharedPreferences("shared preferences", MODE_PRIVATE);
-        editor = sharedPreferences.edit();
-        gson = new Gson();
+//        SharedPreferences sharedPreferences = getSharedPreferences("shared preferences", MODE_PRIVATE);
+//        editor = sharedPreferences.edit();
+//        gson = new Gson();
 
         findViews();
         fetchDescription();
@@ -197,8 +197,8 @@ public class DetailActivity extends AppCompatActivity implements NewsCardAdapter
                     stockSet.get(ticker).setFavorite(false);
                 }
                 supportInvalidateOptionsMenu();
-                saveStockSet();
-                saveWatchList();
+                appData.saveStockSet();
+                appData.saveWatchList();
                 return true;
             case R.id.unFavorite:
                 isFav = true;
@@ -210,8 +210,8 @@ public class DetailActivity extends AppCompatActivity implements NewsCardAdapter
                     stockSet.put(ticker, this.stock);
                 }
                 supportInvalidateOptionsMenu();
-                saveStockSet();
-                saveWatchList();
+                appData.saveStockSet();
+                appData.saveWatchList();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -316,9 +316,9 @@ public class DetailActivity extends AppCompatActivity implements NewsCardAdapter
                         dialog.dismiss();
                         updateInfo();
                         openSuccessDialog("bought", num, ticker);
-                        saveFreeMoney();
-                        saveStockSet();
-                        savePortfolio();
+                        appData.saveFreeMoney();
+                        appData.saveStockSet();
+                        appData.savePortfolio();
 
                     }
 
@@ -629,38 +629,5 @@ public class DetailActivity extends AppCompatActivity implements NewsCardAdapter
             e.printStackTrace();
         }
     }
-
-
-    private void saveStockSet() {
-        String json_map = gson.toJson(stockSet);
-        editor.putString("stock map", json_map);
-        editor.apply();
-    }
-
-    private void savePortfolio() {
-        ArrayList<String> portfolioList = new ArrayList<>();
-        for (int i = 0; i < portfolioStockList.size(); i++) {
-            portfolioList.add(portfolioStockList.get(i).getTicker());
-        }
-        String json_portfolio = gson.toJson(portfolioList);
-        editor.putString("portfolio", json_portfolio);
-        editor.apply();
-    }
-
-    private void saveWatchList() {
-        ArrayList<String> watchList = new ArrayList<>();
-        for (int i = 0; i < favoritesStockList.size(); i++) {
-            watchList.add(favoritesStockList.get(i).getTicker());
-        }
-        String json_watchlist = gson.toJson(watchList);
-        editor.putString("watchlist", json_watchlist);
-        editor.apply();
-    }
-
-    private void saveFreeMoney() {
-        ArrayList<Double> freeMoneyList= new ArrayList<>(Arrays.asList(appData.getFreeMoney()));
-        String json_freeMoney = gson.toJson(freeMoneyList);
-        editor.putString("free money", json_freeMoney);
-        editor.apply();
-    }
+    
 }
