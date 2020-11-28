@@ -80,5 +80,9 @@ public class StockListRecyclerAdapter extends RecyclerView.Adapter<StockListRecy
         void onArrowClick(String ticker);
     }
 
+    public void removeItem(int position) {
+        items.remove(position);
+        notifyItemRemoved(position);
+    }
 
 }

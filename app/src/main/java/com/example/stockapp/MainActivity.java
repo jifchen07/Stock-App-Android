@@ -20,6 +20,7 @@ import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -29,6 +30,7 @@ import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -96,6 +98,8 @@ public class MainActivity extends AppCompatActivity implements StockListRecycler
         portfolioRecyclerView.setAdapter(portfolioRecyclerAdapter);
         favoritesRecyclerView.setAdapter(favoritesRecyclerAdapter);
         netWorthTextView = findViewById(R.id.textViewNetWorth);
+
+        enableSwipeToDelete();
         // update the price data every 15 seconds
 //        new Timer().scheduleAtFixedRate(new TimerTask() {
 //            @Override
@@ -364,6 +368,19 @@ public class MainActivity extends AppCompatActivity implements StockListRecycler
             }
         });
         queue.add(jsonArrayRequest);
+    }
+
+    private void enableSwipeToDelete() {
+        SwipeToDeleteCallback swipeToDeleteCallback = new SwipeToDeleteCallback(this) {
+            @Override
+            public void onSwiped(@NonNull @NotNull RecyclerView.ViewHolder viewHolder, int direction) {
+                final int position = viewHolder.getAdapterPosition();
+                favoritesRecyclerAdapter.removeItem(position);
+            }
+        };
+
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(swipeToDeleteCallback);
+        itemTouchHelper.attachToRecyclerView(favoritesRecyclerView);
     }
 
 
