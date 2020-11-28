@@ -93,8 +93,8 @@ public class MainActivity extends AppCompatActivity implements StockListRecycler
 
         portfolioRecyclerView = findViewById(R.id.portfolioRecyclerView);
         favoritesRecyclerView = findViewById(R.id.favoritesRecyclerView);
-        portfolioRecyclerAdapter = new StockListRecyclerAdapter(portfolioStockList, this);
-        favoritesRecyclerAdapter = new StockListRecyclerAdapter(favoritesStockList, this);
+        portfolioRecyclerAdapter = new StockListRecyclerAdapter(portfolioStockList, this, appData);
+        favoritesRecyclerAdapter = new StockListRecyclerAdapter(favoritesStockList, this, appData);
         ItemTouchHelper.Callback callback = new ItemMoveCallback(favoritesRecyclerAdapter);
         ItemTouchHelper touchHelper = new ItemTouchHelper(callback);
         touchHelper.attachToRecyclerView(favoritesRecyclerView);

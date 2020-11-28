@@ -17,11 +17,13 @@ public class StockListRecyclerAdapter extends RecyclerView.Adapter<StockListRecy
 
     ArrayList<Stock> items;
     private OnArrowClickListener onArrowClickListener;
+    MyApplication appData;
 
 
-    public StockListRecyclerAdapter(ArrayList<Stock> items, OnArrowClickListener onArrowClickListener) {
+    public StockListRecyclerAdapter(ArrayList<Stock> items, OnArrowClickListener onArrowClickListener, MyApplication appData) {
         this.items = items;
         this.onArrowClickListener = onArrowClickListener;
+        this.appData = appData;
     }
 
     @NonNull
@@ -63,6 +65,7 @@ public class StockListRecyclerAdapter extends RecyclerView.Adapter<StockListRecy
             }
         }
         notifyItemMoved(fromPosition, toPosition);
+        appData.saveWatchList();
     }
 
     @Override
