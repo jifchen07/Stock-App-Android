@@ -10,6 +10,7 @@ public class MyApplication extends Application {
     private Map<String, Stock> stockSet;
     private ArrayList<Stock> portfolioStockList;
     private ArrayList<Stock> favoritesStockList;
+    private Double freeMoney;
 
     public Map<String, Stock> getStockSet() {
         return stockSet;
@@ -33,5 +34,23 @@ public class MyApplication extends Application {
 
     public void setFavoritesStockList(ArrayList<Stock> favoritesStockList) {
         this.favoritesStockList = favoritesStockList;
+    }
+
+    public Double getFreeMoney() {
+        return freeMoney;
+    }
+
+    public void setFreeMoney(Double freeMoney) {
+        this.freeMoney = freeMoney;
+    }
+
+    public Double getNetWorth() {
+        Double holdingValue = 0.00;
+        Stock stock;
+        for (int i = 0; i < portfolioStockList.size(); i++) {
+            stock = portfolioStockList.get(i);
+            holdingValue += stock.getLastPrice() * stock.getNumOfShares();
+        }
+        return holdingValue + freeMoney;
     }
 }

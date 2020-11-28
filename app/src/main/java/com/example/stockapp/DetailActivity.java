@@ -2,16 +2,17 @@ package com.example.stockapp;
 
 import android.app.Dialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-import android.widget.GridView;
-import android.widget.ImageView;
-import android.widget.TextView;
+import android.widget.*;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
@@ -27,6 +28,7 @@ import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.bumptech.glide.Glide;
+import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.ms.square.android.expandabletextview.ExpandableTextView;
 import org.json.JSONArray;
@@ -36,10 +38,7 @@ import org.json.JSONObject;
 import java.lang.reflect.Array;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class DetailActivity extends AppCompatActivity implements NewsCardAdapter.OnNewsListener {
     private static final String TAG = "DetailActivity";
@@ -73,6 +72,7 @@ public class DetailActivity extends AppCompatActivity implements NewsCardAdapter
     TextView changeTextView;
     TextView sharesOwnedTextView;
     TextView marketValueTextView;
+    Button tradeButton;
 
     GridView gridViewStats;
     GridViewAdapter gridViewAdapter;
@@ -94,6 +94,11 @@ public class DetailActivity extends AppCompatActivity implements NewsCardAdapter
 
     ArrayList<Stock> favoritesStockList;
     ArrayList<Stock> portfolioStockList;
+
+    Toast toast;
+
+    SharedPreferences.Editor editor;
+    Gson gson;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -135,6 +140,10 @@ public class DetailActivity extends AppCompatActivity implements NewsCardAdapter
 
         queue = Volley.newRequestQueue(getApplicationContext());
 
+        SharedPreferences sharedPreferences = getSharedPreferences("shared preferences", MODE_PRIVATE);
+        editor = sharedPreferences.edit();
+        gson = new Gson();
+
         findViews();
         fetchDescription();
         fetchLatestPrice();
@@ -154,7 +163,7 @@ public class DetailActivity extends AppCompatActivity implements NewsCardAdapter
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(newsAdapter);
 
-
+        setTradeDialog();
     }
 
     @Override
@@ -188,6 +197,8 @@ public class DetailActivity extends AppCompatActivity implements NewsCardAdapter
                     stockSet.get(ticker).setFavorite(false);
                 }
                 supportInvalidateOptionsMenu();
+                saveStockSet();
+                saveWatchList();
                 return true;
             case R.id.unFavorite:
                 isFav = true;
@@ -199,33 +210,196 @@ public class DetailActivity extends AppCompatActivity implements NewsCardAdapter
                     stockSet.put(ticker, this.stock);
                 }
                 supportInvalidateOptionsMenu();
+                saveStockSet();
+                saveWatchList();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
 
-
     }
 
     private void findViews() {
-        tickerTextView = (TextView) findViewById(R.id.textViewTicker);
-        nameTextView = (TextView) findViewById(R.id.textViewName);
-        lastPriceTextView = (TextView) findViewById(R.id.textViewLastPrice);
-        changeTextView = (TextView) findViewById(R.id.textViewChange);
+        tickerTextView = findViewById(R.id.textViewTicker);
+        nameTextView = findViewById(R.id.textViewName);
+        lastPriceTextView = findViewById(R.id.textViewLastPrice);
+        changeTextView = findViewById(R.id.textViewChange);
 
-        sharesOwnedTextView = (TextView) findViewById(R.id.textViewSharesOwned);
-        marketValueTextView = (TextView) findViewById(R.id.textViewMarketValue);
-        gridViewStats = (GridView) findViewById(R.id.gridViewStats);
+        sharesOwnedTextView = findViewById(R.id.textViewSharesOwned);
+        marketValueTextView = findViewById(R.id.textViewMarketValue);
+        tradeButton = findViewById(R.id.buttonTrade);
+        gridViewStats = findViewById(R.id.gridViewStats);
 
-        expTv1 = (ExpandableTextView) findViewById(R.id.expand_text_view);
+        expTv1 = findViewById(R.id.expand_text_view);
 
-        firstNewsImageView = (ImageView) findViewById(R.id.imageViewFirstNews);
-        firstNewsSourceTextView = (TextView) findViewById(R.id.textViewFirstNewsSource);
-        firstNewsDateTextView = (TextView) findViewById(R.id.textViewFirstNewsDate);
-        firstNewsTitleTextView = (TextView) findViewById(R.id.textViewFirstNewsTitle);
+        firstNewsImageView = findViewById(R.id.imageViewFirstNews);
+        firstNewsSourceTextView = findViewById(R.id.textViewFirstNewsSource);
+        firstNewsDateTextView = findViewById(R.id.textViewFirstNewsDate);
+        firstNewsTitleTextView = findViewById(R.id.textViewFirstNewsTitle);
 
-        recyclerView = (RecyclerView) findViewById(R.id.recyclerViewNews);
+        recyclerView = findViewById(R.id.recyclerViewNews);
 
+
+    }
+
+    private void setTradeDialog() {
+        tradeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openTradeDialog();
+            }
+        });
+    }
+
+    private void openTradeDialog() {
+        final Dialog dialog = new Dialog(this);
+        dialog.setContentView(R.layout.trade_dialog);
+        final EditText numOfSharesEditText = dialog.findViewById(R.id.editTextNumber);
+        final TextView tradeTotalTextView = dialog.findViewById(R.id.textViewTradeTotal);
+        TextView tradeTitleTextView = dialog.findViewById(R.id.textViewTradeTitle);
+        TextView availabilityTextView = dialog.findViewById(R.id.textViewAvailability);
+        Button buyButton = dialog.findViewById(R.id.buttonBuy);
+        Button sellButton = dialog.findViewById(R.id.buttonSell);
+
+        tradeTitleTextView.setText("Trade " + stock.getName() + " shares");
+        tradeTotalTextView.setText(getPriceLine(0, stock.getLastPrice()));
+        availabilityTextView.setText(
+                "$" + String.format("%.2f", appData.getFreeMoney()) + " available to buy " + ticker);
+
+        numOfSharesEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                String text = numOfSharesEditText.getText().toString();
+                int num;
+                try {
+                    num = Integer.parseInt(text);
+                } catch (NumberFormatException e) {
+                    num = 0;;
+                }
+                tradeTotalTextView.setText(getPriceLine(num, stock.getLastPrice()));
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+
+
+        });
+
+        buyButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String text = numOfSharesEditText.getText().toString();
+                try {
+                    int num = Integer.parseInt(text);
+                    Double totalPrice = num * stock.getLastPrice();
+                    if ( totalPrice > appData.getFreeMoney()) {
+                        makeToastMessage("Not enough money to buy");
+                    } else if (num <= 0){
+                        makeToastMessage("Cannot buy less than 0 shares");
+                    } else {
+                        int currentNumOfShares = stock.getNumOfShares();
+                        if (currentNumOfShares == 0) {
+                            if (!stockSet.containsKey(ticker)) {
+                                stockSet.put(ticker, stock);
+                            }
+                            portfolioStockList.add(stock);
+                        }
+                        stock.setNumOfShares(currentNumOfShares + num);
+                        appData.setFreeMoney(appData.getFreeMoney() - totalPrice);
+                        dialog.dismiss();
+                        updateInfo();
+                        openSuccessDialog("bought", num, ticker);
+                        saveFreeMoney();
+                        saveStockSet();
+                        savePortfolio();
+
+                    }
+
+                } catch (NumberFormatException e) {
+                    makeToastMessage("Please enter valid amount");
+                }
+
+            }
+        });
+
+        sellButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String text = numOfSharesEditText.getText().toString();
+                try {
+                    int num = Integer.parseInt(text);
+                    Double totalPrice = num * stock.getLastPrice();
+                    if ( num > stock.getNumOfShares()) {
+                        makeToastMessage("Not enough shares to sell");
+                    } else if (num <= 0){
+                        makeToastMessage("Cannot sell less than 0 shares");
+                    } else {
+                        appData.setFreeMoney(appData.getFreeMoney() + totalPrice);
+                        if (stock.getNumOfShares() > num) {
+                            stock.setNumOfShares(stock.getNumOfShares() - num);
+                        } else {
+                            stock.setNumOfShares(0);
+                            portfolioStockList.remove(stock);
+                            if (!stock.isFavorite()) {
+                                stockSet.remove(ticker);
+                            }
+                        }
+
+                        dialog.dismiss();
+                        updateInfo();
+                        openSuccessDialog("sold", num, ticker);
+                    }
+
+                } catch (NumberFormatException e) {
+                    makeToastMessage("Please enter valid amount");
+                }
+            }
+        });
+
+        dialog.show();
+    }
+
+    private void openSuccessDialog(String type, int num, String ticker) {
+        final Dialog dialog = new Dialog(this);
+        dialog.setContentView(R.layout.success_dialog);
+        TextView availabilityTextView = dialog.findViewById(R.id.textViewCongrats);
+        availabilityTextView.setText(
+                "You have successfully " + type + " " + num + " shares of " + ticker);
+        Button doneButton = dialog.findViewById(R.id.buttonDone);
+        doneButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+        dialog.show();
+    }
+
+    public static String getPriceLine(int num, Double price) {
+        Double total = num * price;
+        String line = "" + num + " x " + "$" + String.format("%.2f", price)
+                + "/share = " + "$" + String.format("%.2f", total);
+        return line;
+    }
+
+    private void makeToastMessage(String message) {
+        if (toast != null) { toast.cancel(); }
+        toast = Toast.makeText(getApplicationContext(),
+                message, Toast.LENGTH_SHORT);
+        toast.show();
+    }
+
+    private void updateInfo() {
+        sharesOwnedTextView.setText("Shares owned: " + stock.getNumOfShares());
+        marketValue = lastPrice * stock.getNumOfShares();
+        marketValueTextView.setText("Market Value: $" + String.format("%.2f", marketValue));
     }
 
 
@@ -388,10 +562,10 @@ public class DetailActivity extends AppCompatActivity implements NewsCardAdapter
         final Dialog dialog = new Dialog(this);
         dialog.setContentView(R.layout.news_dialog);
 
-        ImageView imageViewNewsDialog = (ImageView) dialog.findViewById(R.id.imageViewNewsDialog);
-        TextView textViewNewsDialogTitle = (TextView) dialog.findViewById(R.id.textViewNewsDialogTitle);
-        ImageView imageViewTwitter = (ImageView) dialog.findViewById(R.id.imageViewTwitter);
-        ImageView imageViewChrome = (ImageView) dialog.findViewById(R.id.imageViewChrome);
+        ImageView imageViewNewsDialog = dialog.findViewById(R.id.imageViewNewsDialog);
+        TextView textViewNewsDialogTitle = dialog.findViewById(R.id.textViewNewsDialogTitle);
+        ImageView imageViewTwitter = dialog.findViewById(R.id.imageViewTwitter);
+        ImageView imageViewChrome = dialog.findViewById(R.id.imageViewChrome);
 
         String urlToImage = newsItem.getString("urlToImage");
         String title = newsItem.getString("title");
@@ -454,5 +628,39 @@ public class DetailActivity extends AppCompatActivity implements NewsCardAdapter
         } catch (JSONException e) {
             e.printStackTrace();
         }
+    }
+
+
+    private void saveStockSet() {
+        String json_map = gson.toJson(stockSet);
+        editor.putString("stock map", json_map);
+        editor.apply();
+    }
+
+    private void savePortfolio() {
+        ArrayList<String> portfolioList = new ArrayList<>();
+        for (int i = 0; i < portfolioStockList.size(); i++) {
+            portfolioList.add(portfolioStockList.get(i).getTicker());
+        }
+        String json_portfolio = gson.toJson(portfolioList);
+        editor.putString("portfolio", json_portfolio);
+        editor.apply();
+    }
+
+    private void saveWatchList() {
+        ArrayList<String> watchList = new ArrayList<>();
+        for (int i = 0; i < favoritesStockList.size(); i++) {
+            watchList.add(favoritesStockList.get(i).getTicker());
+        }
+        String json_watchlist = gson.toJson(watchList);
+        editor.putString("watchlist", json_watchlist);
+        editor.apply();
+    }
+
+    private void saveFreeMoney() {
+        ArrayList<Double> freeMoneyList= new ArrayList<>(Arrays.asList(appData.getFreeMoney()));
+        String json_freeMoney = gson.toJson(freeMoneyList);
+        editor.putString("free money", json_freeMoney);
+        editor.apply();
     }
 }

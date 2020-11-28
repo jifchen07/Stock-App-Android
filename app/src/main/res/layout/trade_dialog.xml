@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                                                   xmlns:app="http://schemas.android.com/apk/res-auto"
+                                                   xmlns:tools="http://schemas.android.com/tools"
+                                                   android:layout_width="300dp"
+                                                   android:layout_height="300dp">
+
+    <TextView
+            android:text="TextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" android:id="@+id/textViewTradeTitle"
+            app:layout_constraintStart_toStartOf="parent" app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" android:layout_marginTop="24dp"/>
+    <EditText
+            android:layout_width="154dp"
+            android:layout_height="wrap_content"
+            android:inputType="text"
+            android:ems="10"
+            android:id="@+id/editTextNumber"
+            app:layout_constraintTop_toTopOf="parent" android:layout_marginTop="100dp"
+            app:layout_constraintStart_toStartOf="parent" android:layout_marginStart="40dp"/>
+    <TextView
+            android:text="shares"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" android:id="@+id/textView8"
+            app:layout_constraintEnd_toEndOf="parent" app:layout_constraintTop_toTopOf="parent"
+            android:layout_marginTop="110dp" android:layout_marginEnd="40dp"/>
+    <TextView
+            android:text="TextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" android:id="@+id/textViewTradeTotal"
+            app:layout_constraintTop_toBottomOf="@+id/editTextNumber" app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginEnd="40dp" android:layout_marginTop="8dp"/>
+    <TextView
+            android:text="TextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" android:id="@+id/textViewAvailability"
+            app:layout_constraintStart_toStartOf="parent" app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textViewTradeTotal" android:layout_marginTop="32dp"/>
+    <Button
+            android:text="BUY"
+            android:background="@drawable/round_btn_grey"
+            android:layout_width="120dp"
+            android:layout_height="wrap_content" android:id="@+id/buttonBuy"
+            android:paddingTop="5dp" android:paddingBottom="5dp" android:paddingLeft="20dp"
+            android:paddingRight="20dp" android:textColor="@android:color/white"
+            app:layout_constraintTop_toBottomOf="@+id/textViewAvailability"
+            app:layout_constraintBottom_toBottomOf="parent" app:layout_constraintVertical_bias="0.488"
+            app:layout_constraintStart_toStartOf="parent" android:layout_marginStart="16dp"/>
+    <Button
+            android:text="SELL"
+            android:background="@drawable/round_btn_grey"
+            android:layout_width="120dp"
+            android:layout_height="wrap_content" android:id="@+id/buttonSell"
+            android:paddingTop="5dp" android:paddingBottom="5dp" android:paddingLeft="20dp"
+            android:paddingRight="20dp" android:textColor="@android:color/white"
+            app:layout_constraintTop_toBottomOf="@+id/textViewAvailability"
+            app:layout_constraintBottom_toBottomOf="parent" app:layout_constraintVertical_bias="0.488"
+            app:layout_constraintEnd_toEndOf="parent" app:layout_constraintStart_toEndOf="@+id/buttonBuy"
+            android:layout_marginEnd="16dp"/>
+</androidx.constraintlayout.widget.ConstraintLayout>

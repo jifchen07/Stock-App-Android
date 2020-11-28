@@ -14,6 +14,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
@@ -55,6 +56,7 @@ public class MainActivity extends AppCompatActivity implements StockListRecycler
     Map<String, Stock> stockSet;
     ArrayList<String> portfolioList;
     ArrayList<String> watchList;
+    ArrayList<Double> freeMoneyList;
     ArrayList<Stock> portfolioStockList = new ArrayList<>();
     ArrayList<Stock> favoritesStockList = new ArrayList<>();
 
@@ -71,6 +73,8 @@ public class MainActivity extends AppCompatActivity implements StockListRecycler
     StockListRecyclerAdapter favoritesRecyclerAdapter;
     RecyclerView portfolioRecyclerView;
     RecyclerView favoritesRecyclerView;
+
+    TextView netWorthTextView;
 
     boolean loaded = false;
 
@@ -91,7 +95,7 @@ public class MainActivity extends AppCompatActivity implements StockListRecycler
         favoritesRecyclerAdapter = new StockListRecyclerAdapter(favoritesStockList, this);
         portfolioRecyclerView.setAdapter(portfolioRecyclerAdapter);
         favoritesRecyclerView.setAdapter(favoritesRecyclerAdapter);
-
+        netWorthTextView = findViewById(R.id.textViewNetWorth);
         // update the price data every 15 seconds
 //        new Timer().scheduleAtFixedRate(new TimerTask() {
 //            @Override
@@ -128,6 +132,8 @@ public class MainActivity extends AppCompatActivity implements StockListRecycler
         } else {
             portfolioRecyclerAdapter.notifyDataSetChanged();
             favoritesRecyclerAdapter.notifyDataSetChanged();
+            netWorthTextView.setText(String.format("%.2f", appData.getNetWorth()));
+
         }
     }
 
@@ -233,9 +239,6 @@ public class MainActivity extends AppCompatActivity implements StockListRecycler
             stockSet.put("TSLA", new Stock("TSLA", "Tesla Inc", 388.04, 3, true, -22.79, 1000));
             stockSet.put("NFLX", new Stock("NFLX", "NetFlix Inc", 100.00, 0, true, -5.55, 0));
         }
-        if (stockSet.size() > 0) {
-            updatePrice();
-        }
 
         String json_portfolio = sharedPreferences.getString("portfolio", null);
         Type type2 = new TypeToken<ArrayList<String>>(){}.getType();
@@ -252,11 +255,24 @@ public class MainActivity extends AppCompatActivity implements StockListRecycler
             watchList= new ArrayList<>(Arrays.asList("NFLX", "AAPL", "TSLA"));
         }
 
-        saveData();
+        String json_freeMoney = sharedPreferences.getString("free money", null);
+        Type type3 = new TypeToken<ArrayList<Double>>(){}.getType();
+        freeMoneyList = gson.fromJson(json_freeMoney, type3);
+        if (freeMoneyList == null) {
+            Log.d(TAG, "loadData: free money is new");
+            freeMoneyList = new ArrayList<>(Arrays.asList(18500.00));
+        }
 
         updateStockLists();
 
+
         passDataToApplication();
+
+        saveData();
+
+        if (stockSet.size() > 0) {
+            updatePrice();
+        }
     }
 
     private void passDataToApplication() {
@@ -264,6 +280,7 @@ public class MainActivity extends AppCompatActivity implements StockListRecycler
         appData.setStockSet(stockSet);
         appData.setFavoritesStockList(favoritesStockList);
         appData.setPortfolioStockList(portfolioStockList);
+        appData.setFreeMoney(freeMoneyList.get(0));
     }
 
     private void updateStockLists() {
@@ -280,12 +297,27 @@ public class MainActivity extends AppCompatActivity implements StockListRecycler
         SharedPreferences sharedPreferences = getSharedPreferences("shared preferences", MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         Gson gson = new Gson();
+
         String json_map = gson.toJson(stockSet);
+
+        portfolioList.clear();
+        for (int i = 0; i < portfolioStockList.size(); i++) {
+            portfolioList.add(portfolioStockList.get(i).getTicker());
+        }
         String json_portfolio = gson.toJson(portfolioList);
+
+        watchList.clear();
+        for (int i = 0; i < favoritesStockList.size(); i++) {
+            watchList.add(favoritesStockList.get(i).getTicker());
+        }
         String json_watchlist = gson.toJson(watchList);
+
+        freeMoneyList.set(0, appData.getFreeMoney());
+        String json_freeMoney = gson.toJson(freeMoneyList);
         editor.putString("stock map", json_map);
         editor.putString("portfolio", json_portfolio);
         editor.putString("watchlist", json_watchlist);
+        editor.putString("free money", json_freeMoney);
         editor.apply();
     }
 
@@ -320,6 +352,7 @@ public class MainActivity extends AppCompatActivity implements StockListRecycler
                             Log.d(TAG, "onResponse: " + stockSet.get("AAPL").getLastPrice());
                             portfolioRecyclerAdapter.notifyDataSetChanged();
                             favoritesRecyclerAdapter.notifyDataSetChanged();
+                            netWorthTextView.setText(String.format("%.2f", appData.getNetWorth()));
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
