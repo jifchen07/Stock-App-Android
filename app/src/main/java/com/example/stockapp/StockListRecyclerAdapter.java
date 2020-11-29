@@ -46,6 +46,19 @@ public class StockListRecyclerAdapter extends RecyclerView.Adapter<StockListRecy
         } else {
             holder.itemTextViewLL.setText(stock.getName());
         }
+        if (stock.getChange() > 0) {
+            holder.itemTextViewLR.setTextColor(Color.GREEN);
+            holder.imageViewTrendUp.setVisibility(View.VISIBLE);
+            holder.imageViewTrendDown.setVisibility(View.INVISIBLE);
+        } else if (stock.getChange() < 0) {
+            holder.itemTextViewLR.setTextColor(Color.RED);
+            holder.imageViewTrendDown.setVisibility(View.VISIBLE);
+            holder.imageViewTrendUp.setVisibility(View.INVISIBLE);
+        } else {
+            holder.itemTextViewLR.setTextColor(Color.GRAY);
+            holder.imageViewTrendDown.setVisibility(View.INVISIBLE);
+            holder.imageViewTrendUp.setVisibility(View.INVISIBLE);
+        }
     }
 
     @Override
@@ -80,7 +93,7 @@ public class StockListRecyclerAdapter extends RecyclerView.Adapter<StockListRecy
 
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         TextView itemTextViewUL, itemTextViewUR, itemTextViewLL, itemTextViewLR;
-        ImageView imageView;
+        ImageView imageView, imageViewTrendUp, imageViewTrendDown;
         View rowView;
 
         OnArrowClickListener onArrowClickListener;
@@ -93,6 +106,8 @@ public class StockListRecyclerAdapter extends RecyclerView.Adapter<StockListRecy
             itemTextViewLL = itemView.findViewById(R.id.itemTextViewLL);
             itemTextViewLR = itemView.findViewById(R.id.itemTextViewLR);
             imageView = itemView.findViewById(R.id.imageView);
+            imageViewTrendUp = itemView.findViewById(R.id.imageViewTrendUp);
+            imageViewTrendDown = itemView.findViewById(R.id.imageViewTrendDown);
             this.onArrowClickListener = onArrowClickListener;
 
             imageView.setOnClickListener(this);

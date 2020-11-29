@@ -21,6 +21,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
 import com.android.volley.Request;
@@ -368,6 +369,10 @@ public class MainActivity extends AppCompatActivity implements StockListRecycler
                             if (isFirstUpdate) {
                                 portfolioRecyclerView.setAdapter(portfolioRecyclerAdapter);
                                 favoritesRecyclerView.setAdapter(favoritesRecyclerAdapter);
+                                DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(portfolioRecyclerView.getContext(), 1);
+                                portfolioRecyclerView.addItemDecoration(dividerItemDecoration);
+                                dividerItemDecoration = new DividerItemDecoration(favoritesRecyclerView.getContext(), 1);
+                                favoritesRecyclerView.addItemDecoration(dividerItemDecoration);
                                 enableSwipeToDelete();
                             }
                             netWorthTextView.setText(String.format("%.2f", appData.getNetWorth()));
@@ -394,6 +399,7 @@ public class MainActivity extends AppCompatActivity implements StockListRecycler
                 final int position = viewHolder.getAdapterPosition();
                 favoritesRecyclerAdapter.removeItem(position);
                 appData.saveWatchList();
+                appData.saveStockSet();
             }
         };
 
