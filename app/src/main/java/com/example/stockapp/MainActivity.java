@@ -14,6 +14,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.SearchView;
@@ -85,6 +86,7 @@ public class MainActivity extends AppCompatActivity implements StockListRecycler
 
 
     ConstraintLayout mainMainLayout;
+    ProgressBar progressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -99,6 +101,7 @@ public class MainActivity extends AppCompatActivity implements StockListRecycler
         netWorthTextView = findViewById(R.id.textViewNetWorth);
         mainMainLayout = findViewById(R.id.main_main);
         mainMainLayout.setVisibility(View.INVISIBLE);
+        progressBar = findViewById(R.id.ProgressBar01);
 
 
         // initialize data;
@@ -391,6 +394,7 @@ public class MainActivity extends AppCompatActivity implements StockListRecycler
                                 enableSwipeToDelete();
                             }
                             netWorthTextView.setText(String.format("%.2f", appData.getNetWorth()));
+                            progressBar.setVisibility(View.GONE);
                             mainMainLayout.setVisibility(View.VISIBLE);
                         } catch (JSONException e) {
                             e.printStackTrace();
