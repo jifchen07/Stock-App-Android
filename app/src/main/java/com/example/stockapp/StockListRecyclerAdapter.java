@@ -40,9 +40,9 @@ public class StockListRecyclerAdapter extends RecyclerView.Adapter<StockListRecy
         Stock stock = items.get(position);
         holder.itemTextViewUL.setText(stock.getTicker());
         holder.itemTextViewUR.setText(String.valueOf(stock.getLastPrice()));
-        holder.itemTextViewLR.setText(String.valueOf(stock.getChange()));
+        holder.itemTextViewLR.setText(String.format("%.2f", stock.getChange()));
         if (stock.getNumOfShares() > 0) {
-            holder.itemTextViewLL.setText(String.valueOf(stock.getNumOfShares()));
+            holder.itemTextViewLL.setText(String.valueOf(stock.getNumOfShares()) + " shares");
         } else {
             holder.itemTextViewLL.setText(stock.getName());
         }

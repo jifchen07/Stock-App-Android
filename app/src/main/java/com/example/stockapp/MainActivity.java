@@ -1,6 +1,5 @@
 package com.example.stockapp;
 
-//import android.support.v7.widget.Toolbar;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Handler;
@@ -40,7 +39,6 @@ import org.json.JSONObject;
 import java.lang.reflect.Type;
 import java.text.SimpleDateFormat;
 import java.util.*;
-//import android.support.v7.app.AppCompatActivity;
 
 public class MainActivity extends AppCompatActivity implements StockListRecyclerAdapter.OnArrowClickListener {
 
@@ -116,7 +114,7 @@ public class MainActivity extends AppCompatActivity implements StockListRecycler
 //        new Timer().scheduleAtFixedRate(new TimerTask() {
 //            @Override
 //            public void run() {
-//                updatePrice();
+//                updatePrice(false);
 //            }
 //        }, 15000, 15000);
 
@@ -322,11 +320,11 @@ public class MainActivity extends AppCompatActivity implements StockListRecycler
 
     private void updateStockLists() {
 
-        for (int i = 0; i < portfolioList.size(); i++) {
-            portfolioStockList.add(stockSet.get(portfolioList.get(i)));
+        for (String s : portfolioList) {
+            portfolioStockList.add(stockSet.get(s));
         }
-        for (int i = 0; i < watchList.size(); i++) {
-            favoritesStockList.add(stockSet.get(watchList.get(i)));
+        for (String s : watchList) {
+            favoritesStockList.add(stockSet.get(s));
         }
     }
 
@@ -335,31 +333,6 @@ public class MainActivity extends AppCompatActivity implements StockListRecycler
         appData.savePortfolio();
         appData.saveWatchList();
         appData.saveFreeMoney();
-//        SharedPreferences sharedPreferences = getSharedPreferences("shared preferences", MODE_PRIVATE);
-//        SharedPreferences.Editor editor = sharedPreferences.edit();
-//        Gson gson = new Gson();
-//
-//        String json_map = gson.toJson(stockSet);
-//
-//        portfolioList.clear();
-//        for (int i = 0; i < portfolioStockList.size(); i++) {
-//            portfolioList.add(portfolioStockList.get(i).getTicker());
-//        }
-//        String json_portfolio = gson.toJson(portfolioList);
-//
-//        watchList.clear();
-//        for (int i = 0; i < favoritesStockList.size(); i++) {
-//            watchList.add(favoritesStockList.get(i).getTicker());
-//        }
-//        String json_watchlist = gson.toJson(watchList);
-//
-//        freeMoneyList.set(0, appData.getFreeMoney());
-//        String json_freeMoney = gson.toJson(freeMoneyList);
-//        editor.putString("stock map", json_map);
-//        editor.putString("portfolio", json_portfolio);
-//        editor.putString("watchlist", json_watchlist);
-//        editor.putString("free money", json_freeMoney);
-//        editor.apply();
     }
 
 
@@ -367,8 +340,8 @@ public class MainActivity extends AppCompatActivity implements StockListRecycler
     private void updatePrice(final boolean isFirstUpdate) {
         List<String> tickers = new ArrayList<>(stockSet.keySet());
         String tickersString  = "";
-        for (int i = 0; i < tickers.size(); i++) {
-            tickersString = tickersString + tickers.get(i) + ",";
+        for (String ticker : tickers) {
+            tickersString += ticker + ",";
         }
         tickersString = tickersString.substring(0, tickersString.length() - 1);
         String url = "https://stock-search-backend-110320.wl.r.appspot.com/search/latestprice/" + tickersString;
@@ -384,9 +357,9 @@ public class MainActivity extends AppCompatActivity implements StockListRecycler
                             for (int i = 0; i < response.length(); i++) {
                                 JSONObject data = response.getJSONObject(i);
                                 String ticker = data.getString("ticker");
-                                Double lastPrice = data.getDouble("last");
-                                Double prevClose = data.getDouble("prevClose");
-                                Double change = (lastPrice - prevClose) / prevClose * 100;
+                                double lastPrice = data.getDouble("last");
+                                double prevClose = data.getDouble("prevClose");
+                                double change = (lastPrice - prevClose) / prevClose * 100;
                                 stockSet.get(ticker).setLastPrice(lastPrice);
                                 stockSet.get(ticker).setChange(change);
                             }

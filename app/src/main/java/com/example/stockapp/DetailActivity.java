@@ -2,7 +2,6 @@ package com.example.stockapp;
 
 import android.app.Dialog;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.net.Uri;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -29,14 +28,11 @@ import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.bumptech.glide.Glide;
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
 import com.ms.square.android.expandabletextview.ExpandableTextView;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.lang.reflect.Array;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -140,7 +136,7 @@ public class DetailActivity extends AppCompatActivity implements NewsCardAdapter
 
         if (stockSet.containsKey(ticker)) {
             stock = stockSet.get(ticker);
-            isFav = stock.isFavorite() ? true : false;
+            isFav = stock.isFavorite();
         } else {
             stock = new Stock(ticker, "", 0.0, 0, false, 0.0,0.0);
             isFav = false;
@@ -160,7 +156,7 @@ public class DetailActivity extends AppCompatActivity implements NewsCardAdapter
         fetchNews();
         // renderViews();
 
-        webView = (WebView) findViewById(R.id.webView);
+        webView = findViewById(R.id.webView);
         webView.setWebViewClient(new WebViewClient());
         webView.getSettings().setJavaScriptEnabled (true);
         webView.loadUrl("file:///android_asset/highchart.html?ticker=" + ticker);
@@ -302,7 +298,7 @@ public class DetailActivity extends AppCompatActivity implements NewsCardAdapter
                 try {
                     num = Integer.parseInt(text);
                 } catch (NumberFormatException e) {
-                    num = 0;;
+                    num = 0;
                 }
                 tradeTotalTextView.setText(getPriceLine(num, stock.getLastPrice()));
             }
@@ -410,9 +406,8 @@ public class DetailActivity extends AppCompatActivity implements NewsCardAdapter
 
     public static String getPriceLine(int num, Double price) {
         Double total = num * price;
-        String line = "" + num + " x " + "$" + String.format("%.2f", price)
+        return "" + num + " x " + "$" + String.format("%.2f", price)
                 + "/share = " + "$" + String.format("%.2f", total);
-        return line;
     }
 
     private void makeToastMessage(String message) {
@@ -550,7 +545,7 @@ public class DetailActivity extends AppCompatActivity implements NewsCardAdapter
                                     .setText(calTimeDiff(firstNews.getString("publishedAt")));
                             final String newsUrl = firstNews.getString("url");
 
-                            CardView firstNewsCardView = (CardView) findViewById(R.id.cardViewFirstNews);
+                            CardView firstNewsCardView = findViewById(R.id.cardViewFirstNews);
                             firstNewsCardView.setOnClickListener(new View.OnClickListener() {
 
                                 @Override
