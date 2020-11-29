@@ -18,6 +18,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import androidx.appcompat.widget.Toolbar;
 import androidx.cardview.widget.CardView;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.android.volley.Request;
@@ -97,6 +98,12 @@ public class DetailActivity extends AppCompatActivity implements NewsCardAdapter
 
     Toast toast;
 
+    ConstraintLayout detailMainLayout;
+    ProgressBar progressBar;
+    TextView pendingTextView;
+
+    int numOfRequestToMake;
+
 //    SharedPreferences.Editor editor;
 //    Gson gson;
 
@@ -129,6 +136,8 @@ public class DetailActivity extends AppCompatActivity implements NewsCardAdapter
         favoritesStockList = appData.getFavoritesStockList();
         portfolioStockList = appData.getPortfolioStockList();
 
+        numOfRequestToMake = 3;
+
         if (stockSet.containsKey(ticker)) {
             stock = stockSet.get(ticker);
             isFav = stock.isFavorite() ? true : false;
@@ -145,6 +154,7 @@ public class DetailActivity extends AppCompatActivity implements NewsCardAdapter
 //        gson = new Gson();
 
         findViews();
+
         fetchDescription();
         fetchLatestPrice();
         fetchNews();
@@ -164,6 +174,15 @@ public class DetailActivity extends AppCompatActivity implements NewsCardAdapter
         recyclerView.setAdapter(newsAdapter);
 
         setTradeDialog();
+    }
+
+    private void checkRequestStatus() {
+        numOfRequestToMake--;
+        if (numOfRequestToMake == 0) {
+            progressBar.setVisibility(View.GONE);
+            pendingTextView.setVisibility(View.GONE);
+            detailMainLayout.setVisibility(View.VISIBLE);
+        }
     }
 
     @Override
@@ -239,6 +258,10 @@ public class DetailActivity extends AppCompatActivity implements NewsCardAdapter
 
         recyclerView = findViewById(R.id.recyclerViewNews);
 
+        detailMainLayout = findViewById(R.id.detail_main);
+        detailMainLayout.setVisibility(View.INVISIBLE);
+        progressBar = findViewById(R.id.ProgressBar02);
+        pendingTextView = findViewById(R.id.textViewPending02);
 
     }
 
@@ -415,6 +438,7 @@ public class DetailActivity extends AppCompatActivity implements NewsCardAdapter
 
                     @Override
                     public void onResponse(JSONObject response) {
+                        checkRequestStatus();
                         try {
                             name = response.getString("name");
                             stock.setName(name);
@@ -447,6 +471,7 @@ public class DetailActivity extends AppCompatActivity implements NewsCardAdapter
 
                     @Override
                     public void onResponse(JSONArray response) {
+                        checkRequestStatus();
                         try {
                             JSONObject data = response.getJSONObject(0);
                             lastPrice = data.getDouble("last");
@@ -502,6 +527,7 @@ public class DetailActivity extends AppCompatActivity implements NewsCardAdapter
 
                     @Override
                     public void onResponse(JSONObject response) {
+                        checkRequestStatus();
                         try {
                             newsItems.clear();
                             JSONArray articles = response.getJSONArray("articles");
