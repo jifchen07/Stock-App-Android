@@ -36,6 +36,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.lang.reflect.Type;
+import java.text.SimpleDateFormat;
 import java.util.*;
 //import android.support.v7.app.AppCompatActivity;
 
@@ -77,6 +78,7 @@ public class MainActivity extends AppCompatActivity implements StockListRecycler
     RecyclerView favoritesRecyclerView;
 
     TextView netWorthTextView;
+    TextView dateTextView;
 
     boolean loaded = false;
 
@@ -143,6 +145,14 @@ public class MainActivity extends AppCompatActivity implements StockListRecycler
             netWorthTextView.setText(String.format("%.2f", appData.getNetWorth()));
 
         }
+    }
+
+    private void printDate() {
+        dateTextView = findViewById(R.id.textViewDate);
+        String pattern = "MMMM dd, yyyy";
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
+        String date = simpleDateFormat.format(new Date());
+        dateTextView.setText(date);
     }
 
     private void autoComplete() {
@@ -281,6 +291,8 @@ public class MainActivity extends AppCompatActivity implements StockListRecycler
         if (stockSet.size() > 0) {
             updatePrice();
         }
+
+        printDate();
     }
 
     private void passDataToApplication() {
