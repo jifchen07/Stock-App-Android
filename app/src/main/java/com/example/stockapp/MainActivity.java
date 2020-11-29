@@ -87,6 +87,7 @@ public class MainActivity extends AppCompatActivity implements StockListRecycler
 
     ConstraintLayout mainMainLayout;
     ProgressBar progressBar;
+    TextView pendingTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -102,6 +103,7 @@ public class MainActivity extends AppCompatActivity implements StockListRecycler
         mainMainLayout = findViewById(R.id.main_main);
         mainMainLayout.setVisibility(View.INVISIBLE);
         progressBar = findViewById(R.id.ProgressBar01);
+        pendingTextView = findViewById(R.id.textViewPending);
 
 
         // initialize data;
@@ -395,6 +397,7 @@ public class MainActivity extends AppCompatActivity implements StockListRecycler
                             }
                             netWorthTextView.setText(String.format("%.2f", appData.getNetWorth()));
                             progressBar.setVisibility(View.GONE);
+                            pendingTextView.setVisibility(View.GONE);
                             mainMainLayout.setVisibility(View.VISIBLE);
                         } catch (JSONException e) {
                             e.printStackTrace();
