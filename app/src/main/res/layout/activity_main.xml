@@ -8,7 +8,7 @@
         tools:context=".MainActivity">
     <androidx.appcompat.widget.Toolbar
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="40dp"
             android:background="@android:color/background_light"
             android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
             android:minHeight="?attr/actionBarSize" android:id="@+id/toolbar"
@@ -16,7 +16,7 @@
             app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent" app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintHorizontal_bias="0.0" android:layout_marginTop="0dp"
+            app:layout_constraintHorizontal_bias="0.0"
             android:layout_alignParentTop="true"/>
 
     <ProgressBar
@@ -46,10 +46,11 @@
                 android:text="Date"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content" android:id="@+id/textViewDate"
-                android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent" app:layout_constraintHorizontal_bias="0.0"
-                app:layout_constraintTop_toTopOf="parent"/>
+                app:layout_constraintTop_toTopOf="parent" android:paddingLeft="8dp" android:paddingTop="4dp"
+                android:paddingBottom="4dp" android:textStyle="bold" android:textSize="22sp"/>
         <TextView
                 android:text="PORTFOLIO"
                 android:layout_width="0dp"
@@ -57,7 +58,8 @@
                 android:background="#D3D3D3"
                 android:textAppearance="@style/TextAppearance.AppCompat.Body1"
                 app:layout_constraintTop_toBottomOf="@id/textViewDate" app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"/>
+                app:layout_constraintEnd_toEndOf="parent" android:padding="6dp" android:textStyle="bold"
+                android:paddingStart="8dp"/>
         <TextView
                 android:text="FAVORITES"
                 android:layout_width="0dp"
@@ -65,7 +67,9 @@
                 android:background="#D3D3D3"
                 android:textAppearance="@style/TextAppearance.AppCompat.Body1"
                 app:layout_constraintTop_toBottomOf="@+id/portfolioRecyclerView"
-                app:layout_constraintStart_toStartOf="parent" app:layout_constraintEnd_toEndOf="parent"/>
+                app:layout_constraintStart_toStartOf="parent" app:layout_constraintEnd_toEndOf="parent"
+                android:textStyle="bold" android:paddingTop="6dp"
+                android:paddingBottom="5dp" android:paddingStart="8dp"/>
         <androidx.recyclerview.widget.RecyclerView
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                 android:layout_width="0dp"
@@ -78,7 +82,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" android:id="@+id/textViewNetWorth"
                 android:textAppearance="@style/TextAppearance.AppCompat.Large"
-                app:layout_constraintStart_toStartOf="parent" app:layout_constraintTop_toBottomOf="@+id/textView4"/>
+                app:layout_constraintStart_toStartOf="parent" app:layout_constraintTop_toBottomOf="@+id/textView4"
+                android:layout_marginStart="8dp" android:padding="1dp" android:textStyle="bold"/>
         <androidx.recyclerview.widget.RecyclerView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -93,7 +98,15 @@
                 android:layout_height="wrap_content" android:id="@+id/textView4"
                 android:textAppearance="@style/TextAppearance.AppCompat.Large"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/textView2"/>
+                app:layout_constraintTop_toBottomOf="@id/textView2" android:layout_marginStart="8dp"
+                android:padding="1dp"/>
+        <TextView
+                android:text="Powered by tiingo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" android:id="@+id/textViewFooter"
+                app:layout_constraintTop_toBottomOf="@+id/favoritesRecyclerView"
+                app:layout_constraintEnd_toEndOf="parent" app:layout_constraintStart_toStartOf="parent"
+                android:layout_marginTop="16dp" android:textStyle="italic"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

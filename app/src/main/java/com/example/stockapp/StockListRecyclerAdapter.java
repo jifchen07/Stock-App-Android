@@ -47,7 +47,7 @@ public class StockListRecyclerAdapter extends RecyclerView.Adapter<StockListRecy
             holder.itemTextViewLL.setText(stock.getName());
         }
         if (stock.getChange() > 0) {
-            holder.itemTextViewLR.setTextColor(Color.GREEN);
+            holder.itemTextViewLR.setTextColor(Color.parseColor("#51A874"));
             holder.imageViewTrendUp.setVisibility(View.VISIBLE);
             holder.imageViewTrendDown.setVisibility(View.INVISIBLE);
         } else if (stock.getChange() < 0) {

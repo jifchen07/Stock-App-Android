@@ -2,6 +2,7 @@ package com.example.stockapp;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Handler;
 import android.os.Message;
 import android.text.Editable;
@@ -88,6 +89,8 @@ public class MainActivity extends AppCompatActivity implements StockListRecycler
     ProgressBar progressBar;
     TextView pendingTextView;
 
+    TextView footerTextView;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         setTheme(R.style.AppTheme);
@@ -105,6 +108,15 @@ public class MainActivity extends AppCompatActivity implements StockListRecycler
         mainMainLayout.setVisibility(View.INVISIBLE);
         progressBar = findViewById(R.id.ProgressBar01);
         pendingTextView = findViewById(R.id.textViewPending);
+        footerTextView = findViewById(R.id.textViewFooter);
+
+        footerTextView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.tiingo.com/"));
+                startActivity(browserIntent);
+            }
+        });
 
 
         // initialize data;
@@ -360,7 +372,7 @@ public class MainActivity extends AppCompatActivity implements StockListRecycler
                                 String ticker = data.getString("ticker");
                                 double lastPrice = data.getDouble("last");
                                 double prevClose = data.getDouble("prevClose");
-                                double change = (lastPrice - prevClose) / prevClose * 100;
+                                double change = lastPrice - prevClose;
                                 stockSet.get(ticker).setLastPrice(lastPrice);
                                 stockSet.get(ticker).setChange(change);
                             }
