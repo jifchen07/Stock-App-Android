@@ -50,7 +50,7 @@ public class MainActivity extends AppCompatActivity implements StockListRecycler
     private static final String TAG = "MainActivity";
 
     // for autocomplete
-    private static final int TRIGGER_AUTO_COMPLETE = 2000;
+    private static final int TRIGGER_AUTO_COMPLETE = 1000;
     private static final long AUTO_COMPLETE_DELAY = 1000;
     private Handler handler;
     private AutoSuggestAdapter autoSuggestAdapter;
@@ -179,9 +179,6 @@ public class MainActivity extends AppCompatActivity implements StockListRecycler
     }
 
     private void autoComplete() {
-//        final AppCompatAutoCompleteTextView autoCompleteTextView =
-//                findViewById(R.id.auto_complete_edit_text);
-
 
         //Setting up the adapter for AutoSuggest
         autoSuggestAdapter = new AutoSuggestAdapter(this,
@@ -193,7 +190,6 @@ public class MainActivity extends AppCompatActivity implements StockListRecycler
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view,
                                             int position, long id) {
-//                        selectedText.setText(autoSuggestAdapter.getObject(position));
                         String line = autoSuggestAdapter.getObject(position);
                         String ticker = line.split(" - ")[0];
                         Intent intent = new Intent(getApplicationContext(), DetailActivity.class);
@@ -221,8 +217,11 @@ public class MainActivity extends AppCompatActivity implements StockListRecycler
             @Override
             public boolean handleMessage(Message msg) {
                 if (msg.what == TRIGGER_AUTO_COMPLETE) {
-                    if (!TextUtils.isEmpty(searchAutoComplete.getText())) {
+                    if (searchAutoComplete.getText().toString().length() >= 3) {
                         makeApiCall(searchAutoComplete.getText().toString());
+                    } else {
+                        autoSuggestAdapter.setData(new ArrayList<String>());
+                        autoSuggestAdapter.notifyDataSetChanged();
                     }
                 }
                 return false;
@@ -237,12 +236,6 @@ public class MainActivity extends AppCompatActivity implements StockListRecycler
                 //parsing logic, please change it as per your requirement
                 List<String> stringList = new ArrayList<>();
                 try {
-//                    JSONObject responseObject = new JSONObject(response);
-//                    JSONArray array = responseObject.getJSONArray("results");
-//                    for (int i = 0; i < array.length(); i++) {
-//                        JSONObject row = array.getJSONObject(i);
-//                        stringList.add(row.getString("trackName"));
-//                    }
                     JSONArray responseObject = new JSONArray(response);
                     for (int i = 0; i < responseObject.length(); i++) {
                         JSONObject suggestItem = responseObject.getJSONObject(i);
