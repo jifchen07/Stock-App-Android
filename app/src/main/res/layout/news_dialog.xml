@@ -13,20 +13,22 @@
     <TextView
             android:text="TextView"
             android:layout_width="0dp"
-            android:layout_height="100dp" android:id="@+id/textViewNewsDialogTitle"
+            android:layout_height="wrap_content" android:id="@+id/textViewNewsDialogTitle"
             app:layout_constraintTop_toBottomOf="@+id/imageViewNewsDialog" app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"/>
+            app:layout_constraintEnd_toEndOf="parent" android:padding="8dp"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large" android:textStyle="bold"
+            android:textSize="18sp"/>
     <ImageView
             android:layout_width="60dp"
             android:layout_height="60dp" app:srcCompat="@drawable/bluetwitter" android:id="@+id/imageViewTwitter"
             android:scaleType="fitCenter"
             app:layout_constraintTop_toBottomOf="@+id/textViewNewsDialogTitle"
             app:layout_constraintStart_toStartOf="parent"
-            android:layout_marginStart="70dp"/>
+            android:layout_marginStart="65dp"/>
     <ImageView
             android:layout_width="60dp"
             android:layout_height="60dp" app:srcCompat="@drawable/ic_chrome" android:id="@+id/imageViewChrome"
             android:scaleType="fitCenter"
             app:layout_constraintTop_toBottomOf="@+id/textViewNewsDialogTitle" app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginEnd="70dp"/>
+            android:layout_marginEnd="65dp"/>
 </androidx.constraintlayout.widget.ConstraintLayout>

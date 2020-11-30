@@ -1,5 +1,6 @@
 package com.example.stockapp;
 
+import android.app.Dialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
@@ -49,8 +50,8 @@ public class MainActivity extends AppCompatActivity implements StockListRecycler
     private static final String TAG = "MainActivity";
 
     // for autocomplete
-    private static final int TRIGGER_AUTO_COMPLETE = 100;
-    private static final long AUTO_COMPLETE_DELAY = 300;
+    private static final int TRIGGER_AUTO_COMPLETE = 2000;
+    private static final long AUTO_COMPLETE_DELAY = 1000;
     private Handler handler;
     private AutoSuggestAdapter autoSuggestAdapter;
 
@@ -136,7 +137,7 @@ public class MainActivity extends AppCompatActivity implements StockListRecycler
             public void run() {
                 updatePrice(false);
             }
-        }, 5000, 5000);        
+        }, 15000, 15000);
     }
     
     

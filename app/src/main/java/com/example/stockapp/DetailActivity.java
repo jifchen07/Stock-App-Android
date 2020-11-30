@@ -101,6 +101,8 @@ public class DetailActivity extends AppCompatActivity implements NewsCardAdapter
 
     int numOfRequestToMake;
 
+    Dialog tempDialog;
+    int numOfSharesInput;
 //    SharedPreferences.Editor editor;
 //    Gson gson;
 
@@ -171,6 +173,16 @@ public class DetailActivity extends AppCompatActivity implements NewsCardAdapter
         recyclerView.setAdapter(newsAdapter);
 
         setTradeDialog();
+        refreshDataPer15Seconds();
+    }
+
+    private void refreshDataPer15Seconds() {
+        new Timer().scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                fetchLatestPrice();
+            }
+        }, 15000, 15000);
     }
 
     private void checkRequestStatus() {
@@ -179,6 +191,8 @@ public class DetailActivity extends AppCompatActivity implements NewsCardAdapter
             progressBar.setVisibility(View.GONE);
             pendingTextView.setVisibility(View.GONE);
             detailMainLayout.setVisibility(View.VISIBLE);
+        } else if (numOfRequestToMake < 0 ) {
+            numOfRequestToMake = 0;
         }
     }
 
@@ -271,9 +285,17 @@ public class DetailActivity extends AppCompatActivity implements NewsCardAdapter
         });
     }
 
+    private void updatePriceInDialog() {
+        if (tempDialog != null) {
+            TextView tradeTotalTextView = tempDialog.findViewById(R.id.textViewTradeTotal);
+            tradeTotalTextView.setText(getPriceLine(numOfSharesInput, stock.getLastPrice()));
+        }
+    }
+
     private void openTradeDialog() {
         final Dialog dialog = new Dialog(this);
         dialog.setContentView(R.layout.trade_dialog);
+        tempDialog = dialog;
         final EditText numOfSharesEditText = dialog.findViewById(R.id.editTextNumber);
         final TextView tradeTotalTextView = dialog.findViewById(R.id.textViewTradeTotal);
         TextView tradeTitleTextView = dialog.findViewById(R.id.textViewTradeTitle);
@@ -295,13 +317,12 @@ public class DetailActivity extends AppCompatActivity implements NewsCardAdapter
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 String text = numOfSharesEditText.getText().toString();
-                int num;
                 try {
-                    num = Integer.parseInt(text);
+                    numOfSharesInput = Integer.parseInt(text);
                 } catch (NumberFormatException e) {
-                    num = 0;
+                    numOfSharesInput = 0;
                 }
-                tradeTotalTextView.setText(getPriceLine(num, stock.getLastPrice()));
+                tradeTotalTextView.setText(getPriceLine(numOfSharesInput, stock.getLastPrice()));
             }
 
             @Override
@@ -317,11 +338,11 @@ public class DetailActivity extends AppCompatActivity implements NewsCardAdapter
             public void onClick(View v) {
                 String text = numOfSharesEditText.getText().toString();
                 try {
-                    int num = Integer.parseInt(text);
-                    Double totalPrice = num * stock.getLastPrice();
+                    numOfSharesInput = Integer.parseInt(text);
+                    Double totalPrice = numOfSharesInput * stock.getLastPrice();
                     if ( totalPrice > appData.getFreeMoney()) {
                         makeToastMessage("Not enough money to buy");
-                    } else if (num <= 0){
+                    } else if (numOfSharesInput <= 0){
                         makeToastMessage("Cannot buy less than 0 shares");
                     } else {
                         int currentNumOfShares = stock.getNumOfShares();
@@ -331,11 +352,11 @@ public class DetailActivity extends AppCompatActivity implements NewsCardAdapter
                             }
                             portfolioStockList.add(stock);
                         }
-                        stock.setNumOfShares(currentNumOfShares + num);
+                        stock.setNumOfShares(currentNumOfShares + numOfSharesInput);
                         appData.setFreeMoney(appData.getFreeMoney() - totalPrice);
                         dialog.dismiss();
                         updatePortfolioInfo();
-                        openSuccessDialog("bought", num, ticker);
+                        openSuccessDialog("bought", numOfSharesInput, ticker);
                         appData.saveFreeMoney();
                         appData.saveStockSet();
                         appData.savePortfolio();
@@ -354,16 +375,16 @@ public class DetailActivity extends AppCompatActivity implements NewsCardAdapter
             public void onClick(View v) {
                 String text = numOfSharesEditText.getText().toString();
                 try {
-                    int num = Integer.parseInt(text);
-                    Double totalPrice = num * stock.getLastPrice();
-                    if ( num > stock.getNumOfShares()) {
+                    numOfSharesInput = Integer.parseInt(text);
+                    Double totalPrice = numOfSharesInput * stock.getLastPrice();
+                    if ( numOfSharesInput > stock.getNumOfShares()) {
                         makeToastMessage("Not enough shares to sell");
-                    } else if (num <= 0){
+                    } else if (numOfSharesInput <= 0){
                         makeToastMessage("Cannot sell less than 0 shares");
                     } else {
                         appData.setFreeMoney(appData.getFreeMoney() + totalPrice);
-                        if (stock.getNumOfShares() > num) {
-                            stock.setNumOfShares(stock.getNumOfShares() - num);
+                        if (stock.getNumOfShares() > numOfSharesInput) {
+                            stock.setNumOfShares(stock.getNumOfShares() - numOfSharesInput);
                         } else {
                             stock.setNumOfShares(0);
                             portfolioStockList.remove(stock);
@@ -374,7 +395,7 @@ public class DetailActivity extends AppCompatActivity implements NewsCardAdapter
 
                         dialog.dismiss();
                         updatePortfolioInfo();
-                        openSuccessDialog("sold", num, ticker);
+                        openSuccessDialog("sold", numOfSharesInput, ticker);
                         appData.saveFreeMoney();
                         appData.saveStockSet();
                         appData.savePortfolio();
@@ -474,6 +495,7 @@ public class DetailActivity extends AppCompatActivity implements NewsCardAdapter
                     @Override
                     public void onResponse(JSONArray response) {
                         checkRequestStatus();
+                        Log.d(TAG, "onResponse: fetchLatestPrice()");
                         try {
                             JSONObject data = response.getJSONObject(0);
                             lastPrice = data.getDouble("last");
@@ -488,7 +510,6 @@ public class DetailActivity extends AppCompatActivity implements NewsCardAdapter
                             openPrice = data.isNull("open") ? null : data.getDouble("open");
                             volume = data.isNull("volume") ? null : data.getInt("volume");
 
-                            Log.d(TAG, "onResponse: " + String.format("%.2f", lastPrice));
                             lastPriceTextView.setText("$" + String.format("%.2f", lastPrice));
                             changeTextView.setText("$" + String.format("%.2f", changePrice));
 
@@ -501,6 +522,7 @@ public class DetailActivity extends AppCompatActivity implements NewsCardAdapter
                             }
 
                             updatePortfolioInfo();
+                            updatePriceInDialog();
 
                             gridData[0] = "Current Price: " + String.format("%.2f", lastPrice);
                             gridData[1] = "Low: " + ((lowPrice == null) ? "-" : String.format("%.2f", lowPrice));

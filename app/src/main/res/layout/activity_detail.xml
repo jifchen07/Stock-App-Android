@@ -51,7 +51,6 @@
                 app:layout_constraintHorizontal_bias="0.0" app:layout_constraintBottom_toBottomOf="parent"
         >
             <LinearLayout android:layout_width="match_parent" android:layout_height="0dp"
-                          android:orientation="vertical">
                           android:orientation="vertical" android:layout_marginStart="4dp"
                           android:layout_marginEnd="4dp">
                 <androidx.constraintlayout.widget.ConstraintLayout
@@ -175,8 +174,9 @@
                                 android:layout_height="wrap_content"
                                 android:layout_marginLeft="10dp"
                                 android:layout_marginRight="10dp"
-                                android:textSize="16sp"
-                                android:textColor="#666666"/>
+                                android:textSize="14sp"
+                                android:textColor="@android:color/black"
+                                android:textAppearance="@style/TextAppearance.AppCompat.Body2"/>
                         <ImageButton
                                 android:id="@id/expand_collapse"
                                 android:layout_width="wrap_content"
@@ -226,7 +226,8 @@
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content" android:id="@+id/textViewFirstNewsSource"
                                     app:layout_constraintTop_toBottomOf="@+id/cardView"
-                                    app:layout_constraintStart_toStartOf="parent"/>
+                                    app:layout_constraintStart_toStartOf="parent" android:textStyle="bold"
+                                    android:layout_marginStart="8dp"/>
                             <TextView
                                     android:text="TextView"
                                     android:layout_width="wrap_content"
@@ -240,7 +241,10 @@
                                     android:layout_height="wrap_content" android:id="@+id/textViewFirstNewsTitle"
                                     app:layout_constraintStart_toStartOf="parent"
                                     app:layout_constraintTop_toBottomOf="@+id/textViewFirstNewsSource"
-                                    app:layout_constraintEnd_toEndOf="parent"/>
+                                    app:layout_constraintEnd_toEndOf="parent"
+                                    android:textAppearance="@style/TextAppearance.AppCompat.Body2"
+                                    android:textSize="16sp" android:textStyle="bold" android:layout_marginStart="8dp"
+                                    android:layout_marginEnd="8dp"/>
                         </androidx.constraintlayout.widget.ConstraintLayout>
                     </androidx.cardview.widget.CardView>
                     <androidx.recyclerview.widget.RecyclerView
