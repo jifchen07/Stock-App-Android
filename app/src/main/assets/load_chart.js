@@ -82,13 +82,9 @@ Highcharts.getJSON(url, function (data) {
             selected: 2
         },
 
-        title: {
-            text: `${ticker} Historical`
-        },
+        title: false,
 
-        subtitle: {
-            text: 'With SMA and Volume by Price technical indicators'
-        },
+        subtitle: false,
 
         yAxis: [{
             startOnTick: false,

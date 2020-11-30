@@ -124,17 +124,22 @@ public class MainActivity extends AppCompatActivity implements StockListRecycler
 
 
         // update the price data every 15 seconds
-//        new Timer().scheduleAtFixedRate(new TimerTask() {
-//            @Override
-//            public void run() {
-//                updatePrice(false);
-//            }
-//        }, 15000, 15000);
+        refreshDataPer15Seconds();
 
 
 
     }
 
+    private void refreshDataPer15Seconds() {
+        new Timer().scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                updatePrice(false);
+            }
+        }, 5000, 5000);        
+    }
+    
+    
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
             MenuInflater inflater = getMenuInflater();
@@ -376,8 +381,10 @@ public class MainActivity extends AppCompatActivity implements StockListRecycler
                                 stockSet.get(ticker).setLastPrice(lastPrice);
                                 stockSet.get(ticker).setChange(change);
                             }
+                            Log.d(TAG, "onResponse: data refreshed");
                             portfolioRecyclerAdapter.notifyDataSetChanged();
                             favoritesRecyclerAdapter.notifyDataSetChanged();
+                            netWorthTextView.setText(String.format("%.2f", appData.getNetWorth()));
                             if (isFirstUpdate) {
                                 portfolioRecyclerView.setAdapter(portfolioRecyclerAdapter);
                                 favoritesRecyclerView.setAdapter(favoritesRecyclerAdapter);
@@ -386,11 +393,11 @@ public class MainActivity extends AppCompatActivity implements StockListRecycler
                                 dividerItemDecoration = new DividerItemDecoration(favoritesRecyclerView.getContext(), 1);
                                 favoritesRecyclerView.addItemDecoration(dividerItemDecoration);
                                 enableSwipeToDelete();
+
+                                progressBar.setVisibility(View.GONE);
+                                pendingTextView.setVisibility(View.GONE);
+                                mainMainLayout.setVisibility(View.VISIBLE);
                             }
-                            netWorthTextView.setText(String.format("%.2f", appData.getNetWorth()));
-                            progressBar.setVisibility(View.GONE);
-                            pendingTextView.setVisibility(View.GONE);
-                            mainMainLayout.setVisibility(View.VISIBLE);
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }

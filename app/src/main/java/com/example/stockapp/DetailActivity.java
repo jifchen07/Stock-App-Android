@@ -2,6 +2,7 @@ package com.example.stockapp;
 
 import android.app.Dialog;
 import android.content.Intent;
+import android.graphics.Color;
 import android.net.Uri;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -333,7 +334,7 @@ public class DetailActivity extends AppCompatActivity implements NewsCardAdapter
                         stock.setNumOfShares(currentNumOfShares + num);
                         appData.setFreeMoney(appData.getFreeMoney() - totalPrice);
                         dialog.dismiss();
-                        updateInfo();
+                        updatePortfolioInfo();
                         openSuccessDialog("bought", num, ticker);
                         appData.saveFreeMoney();
                         appData.saveStockSet();
@@ -372,7 +373,7 @@ public class DetailActivity extends AppCompatActivity implements NewsCardAdapter
                         }
 
                         dialog.dismiss();
-                        updateInfo();
+                        updatePortfolioInfo();
                         openSuccessDialog("sold", num, ticker);
                         appData.saveFreeMoney();
                         appData.saveStockSet();
@@ -417,10 +418,16 @@ public class DetailActivity extends AppCompatActivity implements NewsCardAdapter
         toast.show();
     }
 
-    private void updateInfo() {
-        sharesOwnedTextView.setText("Shares owned: " + stock.getNumOfShares());
-        marketValue = lastPrice * stock.getNumOfShares();
-        marketValueTextView.setText("Market Value: $" + String.format("%.2f", marketValue));
+    private void updatePortfolioInfo() {
+        if (stock.getNumOfShares() > 0) {
+            sharesOwnedTextView.setText("Shares owned: " + stock.getNumOfShares());
+            marketValue = lastPrice * stock.getNumOfShares();
+            marketValueTextView.setText("Market Value: $" + String.format("%.2f", marketValue));
+        } else {
+            sharesOwnedTextView.setText("You have 0 shares of " + ticker);
+            marketValueTextView.setText("Start trading!");
+        }
+
     }
 
 
@@ -481,13 +488,19 @@ public class DetailActivity extends AppCompatActivity implements NewsCardAdapter
                             openPrice = data.isNull("open") ? null : data.getDouble("open");
                             volume = data.isNull("volume") ? null : data.getInt("volume");
 
-                            marketValue = stock.getNumOfShares() * lastPrice;
-
                             Log.d(TAG, "onResponse: " + String.format("%.2f", lastPrice));
-                            lastPriceTextView.setText(String.format("%.2f", lastPrice));
-                            changeTextView.setText(String.format("%.2f", changePrice));
-                            sharesOwnedTextView.setText("Shares owned: " + stock.getNumOfShares());
-                            marketValueTextView.setText("Market Value: $" + String.format("%.2f", marketValue));
+                            lastPriceTextView.setText("$" + String.format("%.2f", lastPrice));
+                            changeTextView.setText("$" + String.format("%.2f", changePrice));
+
+                            if (changePrice > 0) {
+                                changeTextView.setTextColor(Color.parseColor("#51A874"));
+                            } else if (changePrice < 0) {
+                                changeTextView.setTextColor(Color.RED);
+                            } else {
+                                changeTextView.setTextColor(Color.GRAY);
+                            }
+
+                            updatePortfolioInfo();
 
                             gridData[0] = "Current Price: " + String.format("%.2f", lastPrice);
                             gridData[1] = "Low: " + ((lowPrice == null) ? "-" : String.format("%.2f", lowPrice));
