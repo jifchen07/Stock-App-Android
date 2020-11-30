@@ -79,6 +79,7 @@ public class StockListRecyclerAdapter extends RecyclerView.Adapter<StockListRecy
         }
         notifyItemMoved(fromPosition, toPosition);
         appData.saveWatchList();
+        appData.savePortfolio();
     }
 
     @Override

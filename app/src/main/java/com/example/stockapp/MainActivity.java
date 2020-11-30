@@ -123,11 +123,8 @@ public class MainActivity extends AppCompatActivity implements StockListRecycler
         // initialize data;
         loadData();
 
-
         // update the price data every 15 seconds
         refreshDataPer15Seconds();
-
-
 
     }
 
@@ -309,6 +306,9 @@ public class MainActivity extends AppCompatActivity implements StockListRecycler
         ItemTouchHelper.Callback callback = new ItemMoveCallback(favoritesRecyclerAdapter);
         ItemTouchHelper touchHelper = new ItemTouchHelper(callback);
         touchHelper.attachToRecyclerView(favoritesRecyclerView);
+        ItemTouchHelper.Callback callback2 = new ItemMoveCallback(portfolioRecyclerAdapter);
+        ItemTouchHelper touchHelper2 = new ItemTouchHelper(callback2);
+        touchHelper2.attachToRecyclerView(portfolioRecyclerView);
 
 
         // update stock prices
@@ -386,6 +386,7 @@ public class MainActivity extends AppCompatActivity implements StockListRecycler
                                 portfolioRecyclerView.addItemDecoration(dividerItemDecoration);
                                 dividerItemDecoration = new DividerItemDecoration(favoritesRecyclerView.getContext(), 1);
                                 favoritesRecyclerView.addItemDecoration(dividerItemDecoration);
+
                                 enableSwipeToDelete();
 
                                 progressBar.setVisibility(View.GONE);
