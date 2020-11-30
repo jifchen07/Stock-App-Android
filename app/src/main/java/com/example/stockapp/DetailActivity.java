@@ -218,6 +218,7 @@ public class DetailActivity extends AppCompatActivity implements NewsCardAdapter
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
             case R.id.favorite:
+                makeToastMessage(ticker + " is removed from favorites");
                 isFav = false;
                 Stock stock = stockSet.get(ticker);
                 favoritesStockList.remove(stock);
@@ -231,6 +232,7 @@ public class DetailActivity extends AppCompatActivity implements NewsCardAdapter
                 appData.saveWatchList();
                 return true;
             case R.id.unFavorite:
+                makeToastMessage(ticker + " is added to favorites");
                 isFav = true;
                 this.stock.setFavorite(true);
                 favoritesStockList.add(this.stock);
