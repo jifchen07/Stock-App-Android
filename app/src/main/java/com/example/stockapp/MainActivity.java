@@ -124,7 +124,7 @@ public class MainActivity extends AppCompatActivity implements StockListRecycler
         loadData();
 
         // update the price data every 15 seconds
-        refreshDataPer15Seconds();
+//        refreshDataPer15Seconds();
 
     }
 

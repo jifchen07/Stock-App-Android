@@ -17,11 +17,11 @@
     <EditText
             android:layout_width="154dp"
             android:layout_height="wrap_content"
-            android:inputType="text"
             android:ems="10"
             android:id="@+id/editTextNumber"
             app:layout_constraintTop_toTopOf="parent" android:layout_marginTop="100dp"
-            app:layout_constraintStart_toStartOf="parent" android:layout_marginStart="40dp"/>
+            app:layout_constraintStart_toStartOf="parent" android:layout_marginStart="40dp"
+            android:inputType="number|text"/>
     <TextView
             android:text="shares"
             android:layout_width="wrap_content"

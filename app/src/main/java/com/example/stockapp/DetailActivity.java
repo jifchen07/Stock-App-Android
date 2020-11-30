@@ -173,7 +173,7 @@ public class DetailActivity extends AppCompatActivity implements NewsCardAdapter
         recyclerView.setAdapter(newsAdapter);
 
         setTradeDialog();
-        refreshDataPer15Seconds();
+//        refreshDataPer15Seconds();
     }
 
     private void refreshDataPer15Seconds() {
@@ -513,13 +513,15 @@ public class DetailActivity extends AppCompatActivity implements NewsCardAdapter
                             volume = data.isNull("volume") ? null : data.getInt("volume");
 
                             lastPriceTextView.setText("$" + String.format("%.2f", lastPrice));
-                            changeTextView.setText("$" + String.format("%.2f", changePrice));
 
                             if (changePrice > 0) {
+                                changeTextView.setText("+$" + String.format("%.2f", changePrice));
                                 changeTextView.setTextColor(Color.parseColor("#51A874"));
                             } else if (changePrice < 0) {
+                                changeTextView.setText("-$" + String.format("%.2f", Math.abs(changePrice)));
                                 changeTextView.setTextColor(Color.RED);
                             } else {
+                                changeTextView.setText("$" + String.format("%.2f", changePrice));
                                 changeTextView.setTextColor(Color.GRAY);
                             }
 
