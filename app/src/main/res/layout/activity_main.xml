@@ -88,7 +88,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content" android:id="@+id/textViewNetWorth"
                         android:textAppearance="@style/TextAppearance.AppCompat.Large"
-                        app:layout_constraintStart_toStartOf="parent" app:layout_constraintTop_toBottomOf="@+id/textView4"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/textView4"
                         android:layout_marginStart="8dp" android:padding="1dp" android:textStyle="bold"/>
                 <androidx.recyclerview.widget.RecyclerView
                         android:layout_width="0dp"
@@ -113,6 +114,13 @@
                         app:layout_constraintTop_toBottomOf="@+id/favoritesRecyclerView"
                         app:layout_constraintEnd_toEndOf="parent" app:layout_constraintStart_toStartOf="parent"
                         android:layout_marginTop="16dp" android:textStyle="italic"/>
+                <View
+                        android:layout_width="0dp"
+                        android:layout_height="1dp" android:id="@+id/view"
+                        app:layout_constraintBottom_toTopOf="@+id/portfolioRecyclerView"
+                        app:layout_constraintTop_toBottomOf="@+id/textViewNetWorth"
+                        android:background="@color/colorAccent"
+                        app:layout_constraintStart_toStartOf="parent" app:layout_constraintEnd_toEndOf="parent"/>
 
             </androidx.constraintlayout.widget.ConstraintLayout>
         </LinearLayout>

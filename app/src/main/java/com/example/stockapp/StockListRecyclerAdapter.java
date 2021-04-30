@@ -39,7 +39,7 @@ public class StockListRecyclerAdapter extends RecyclerView.Adapter<StockListRecy
     public void onBindViewHolder(@NonNull @NotNull ViewHolder holder, int position) {
         Stock stock = items.get(position);
         holder.itemTextViewUL.setText(stock.getTicker());
-        holder.itemTextViewUR.setText(String.valueOf(stock.getLastPrice()));
+        holder.itemTextViewUR.setText(String.format("%.2f", stock.getLastPrice()));
         holder.itemTextViewLR.setText(String.format("%.2f", Math.abs(stock.getChange())));
         if (stock.getNumOfShares() > 0) {
             holder.itemTextViewLL.setText(stock.getNumOfShares() + " shares");

@@ -42,7 +42,9 @@ public class NewsCardAdapter extends RecyclerView.Adapter<NewsCardAdapter.NewsVi
         JSONObject item = newsItems.get(position);
         try {
             holder.textViewNewsSource.setText(item.getJSONObject("source").getString("name"));
-            holder.textViewNewsTitle.setText(item.getString("title"));
+            String title = item.getString("title");
+            holder.textViewNewsTitle.setText(
+                    title.startsWith(":")? title.substring(2) : title);
             holder.textViewNewsDate.setText(DetailActivity.calTimeDiff(item.getString("publishedAt")));
             Glide.with(context)
                     .load(item.getString("urlToImage"))

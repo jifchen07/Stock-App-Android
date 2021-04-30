@@ -55,9 +55,6 @@ public class MainActivity extends AppCompatActivity implements StockListRecycler
     private Handler handler;
     private AutoSuggestAdapter autoSuggestAdapter;
 
-    // for section recycler view
-//    List<Section> sectionList = new ArrayList<>();
-//    RecyclerView mainRecyclerView;
 
     Map<String, Stock> stockSet;
     ArrayList<String> portfolioList;
@@ -67,7 +64,6 @@ public class MainActivity extends AppCompatActivity implements StockListRecycler
     ArrayList<Stock> favoritesStockList = new ArrayList<>();
 
 //    MainRecyclerAdapter mainRecyclerAdapter;
-
 
     // for application data
     MyApplication appData;
@@ -84,7 +80,6 @@ public class MainActivity extends AppCompatActivity implements StockListRecycler
     TextView dateTextView;
 
     boolean loaded = false;
-
 
     ConstraintLayout mainMainLayout;
     ProgressBar progressBar;
@@ -119,12 +114,11 @@ public class MainActivity extends AppCompatActivity implements StockListRecycler
             }
         });
 
-
         // initialize data;
         loadData();
 
         // update the price data every 15 seconds
-//        refreshDataPer15Seconds();
+        refreshDataPer15Seconds();
 
     }
 
@@ -136,7 +130,6 @@ public class MainActivity extends AppCompatActivity implements StockListRecycler
             }
         }, 15000, 15000);
     }
-    
     
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -163,7 +156,6 @@ public class MainActivity extends AppCompatActivity implements StockListRecycler
             portfolioRecyclerAdapter.notifyDataSetChanged();
             favoritesRecyclerAdapter.notifyDataSetChanged();
             netWorthTextView.setText(String.format("%.2f", appData.getNetWorth()));
-
         }
     }
 
@@ -346,8 +338,6 @@ public class MainActivity extends AppCompatActivity implements StockListRecycler
         appData.saveWatchList();
         appData.saveFreeMoney();
     }
-
-
 
     private void updatePrice(final boolean isFirstUpdate) {
         List<String> tickers = new ArrayList<>(stockSet.keySet());

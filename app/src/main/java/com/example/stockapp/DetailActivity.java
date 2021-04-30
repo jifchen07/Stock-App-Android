@@ -103,8 +103,7 @@ public class DetailActivity extends AppCompatActivity implements NewsCardAdapter
 
     Dialog tempDialog;
     int numOfSharesInput;
-//    SharedPreferences.Editor editor;
-//    Gson gson;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -529,11 +528,11 @@ public class DetailActivity extends AppCompatActivity implements NewsCardAdapter
                             updatePriceInDialog();
 
                             gridData[0] = "Current Price: " + String.format("%.2f", lastPrice);
-                            gridData[1] = "Low: " + ((lowPrice == null) ? "-" : String.format("%.2f", lowPrice));
-                            gridData[2] = "Bid Price: " + ((bidPrice == null) ? "-" : String.format("%.2f", bidPrice));
-                            gridData[3] = "Open Price: " + ((openPrice == null) ? "-" : String.format("%.2f", openPrice));
-                            gridData[4] = "Mid: " + ((midPrice == null) ? "-" : String.format("%.2f", midPrice));
-                            gridData[5] = "High: " + ((highPrice == null) ? "-" : String.format("%.2f", highPrice));
+                            gridData[1] = "Low: " + ((lowPrice == null) ? "0.0" : String.format("%.2f", lowPrice));
+                            gridData[2] = "Bid Price: " + ((bidPrice == null) ? "0.0" : String.format("%.2f", bidPrice));
+                            gridData[3] = "Open Price: " + ((openPrice == null) ? "0.0" : String.format("%.2f", openPrice));
+                            gridData[4] = "Mid: " + ((midPrice == null) ? "0.0" : String.format("%.2f", midPrice));
+                            gridData[5] = "High: " + ((highPrice == null) ? "0.0" : String.format("%.2f", highPrice));
                             gridData[6] = "Volume: " + volume;
 
                             gridViewAdapter.notifyDataSetChanged();
@@ -578,8 +577,9 @@ public class DetailActivity extends AppCompatActivity implements NewsCardAdapter
                                     .into(firstNewsImageView);
                             firstNewsSourceTextView
                                     .setText(firstNews.getJSONObject("source").getString("name"));
+                            String title = firstNews.getString("title");
                             firstNewsTitleTextView
-                                    .setText(firstNews.getString("title"));
+                                    .setText(title.startsWith(":") ? title.substring(2) : title);
                             firstNewsDateTextView
                                     .setText(calTimeDiff(firstNews.getString("publishedAt")));
                             final String newsUrl = firstNews.getString("url");
@@ -639,7 +639,7 @@ public class DetailActivity extends AppCompatActivity implements NewsCardAdapter
                 .load(urlToImage)
                 .centerCrop()
                 .into(imageViewNewsDialog);
-        textViewNewsDialogTitle.setText(title);
+        textViewNewsDialogTitle.setText(title.startsWith(":") ? title.substring(2) : title);
 
         imageViewTwitter.setOnClickListener(new View.OnClickListener() {
 
